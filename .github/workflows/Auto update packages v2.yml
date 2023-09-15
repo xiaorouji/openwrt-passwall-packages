@@ -11,6 +11,16 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
+
+      is_update_sing-box:
+        description: 'is update sing-box'
+        required: false
+        default: 'false'
+
+      is_update_geodata:
+        description: 'is update geodata'
+        required: false
+        default: 'false'  
   schedule:
     - cron: "0 */4 * * *"
 env:
@@ -50,7 +60,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pakcages: [brook, chinadns-ng, hysteria, ipt2socks, microsocks, trojan, trojan-go, v2ray-core, v2ray-plugin, xray-core, xray-plugin]
+        pakcages: [brook, chinadns-ng, hysteria, ipt2socks, microsocks,sing-box, trojan, trojan-go, v2ray-core, v2ray-plugin, xray-core, xray-plugin, v2ray-geoip, v2ray-geosite]
         include:
           - pakcages: brook
             folder: brook
@@ -102,15 +112,15 @@ jobs:
             release_download_url: https://codeload.github.com/rofl0r/microsocks/tar.gz/v
             file_name:
 
-          # - pakcages: sing-box
-          #   folder: sing-box
-          #   version_line: 9
-          #   hash_line: 14
-          #   version_head: PKG_VERSION:=
-          #   hash_head: PKG_HASH:=
-          #   release_api_command: wget -qO- -t5 -T5 "https://api.github.com/repos/SagerNet/sing-box/releases" | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g' | awk -F 'v' '{print $2}'
-          #   release_download_url: https://codeload.github.com/SagerNet/sing-box/tar.gz/v
-          #   file_name:
+          - pakcages: sing-box
+            folder: sing-box
+            version_line: 9
+            hash_line: 14
+            version_head: PKG_VERSION:=
+            hash_head: PKG_HASH:=
+            release_api_command: wget -qO- -t5 -T5 "https://api.github.com/repos/SagerNet/sing-box/releases" | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g' | awk -F 'v' '{print $2}'
+            release_download_url: https://codeload.github.com/SagerNet/sing-box/tar.gz/v
+            file_name:
 
           - pakcages: trojan
             folder: trojan
@@ -172,26 +182,26 @@ jobs:
             release_download_url: https://codeload.github.com/teddysun/xray-plugin/tar.gz/v
             file_name: 
 
-          # - pakcages: v2ray-geoip
-          #   folder: v2ray-geodata
-          #   version_line: 15
-          #   hash_line: 21
-          #   version_head: GEOIP_VER:=
-          #   hash_head: \  HASH:=
-          #   release_api_command: wget -qO- -t5 -T5 "https://api.github.com/repos/v2fly/geoip/releases" | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'
-          #   release_download_url: https://github.com/v2fly/geoip/releases/download/
-          #   file_name: /geoip.dat
+          - pakcages: v2ray-geoip
+            folder: v2ray-geodata
+            version_line: 15
+            hash_line: 21
+            version_head: GEOIP_VER:=
+            hash_head: \  HASH:=
+            release_api_command: wget -qO- -t5 -T5 "https://api.github.com/repos/v2fly/geoip/releases" | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'
+            release_download_url: https://github.com/v2fly/geoip/releases/download/
+            file_name: /geoip.dat
 
 
-          # - pakcages: v2ray-geosite
-          #   folder: v2ray-geodata
-          #   version_line: 24
-          #   hash_line: 30
-          #   version_head: GEOSITE_VER:=
-          #   hash_head: \  HASH:=
-          #   release_api_command: wget -qO- -t5 -T5 "https://api.github.com/repos/v2fly/domain-list-community/releases" | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'
-          #   release_download_url: https://github.com/v2fly/domain-list-community/releases/download/
-          #   file_name: /dlc.dat
+          - pakcages: v2ray-geosite
+            folder: v2ray-geodata
+            version_line: 24
+            hash_line: 30
+            version_head: GEOSITE_VER:=
+            hash_head: \  HASH:=
+            release_api_command: wget -qO- -t5 -T5 "https://api.github.com/repos/v2fly/domain-list-community/releases" | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'
+            release_download_url: https://github.com/v2fly/domain-list-community/releases/download/
+            file_name: /dlc.dat
 
     steps:
       - name: Checkout
@@ -206,13 +216,35 @@ jobs:
       - name: Check ${{ matrix.pakcages }}
         id: check
         run: |
-          cd && cd work/openwrt-passwall-packages/openwrt-passwall-packages/${{ matrix.folder }} 
-          Old_PKG_VERSION=$(sed -n '${{ matrix.version_line }}p' Makefile | awk -F '=' '{print $2}')
-          New_PKG_VERSION=$(${{ matrix.release_api_command }})
-          echo "${{ matrix.pakcages }}目前版本: $Old_PKG_VERSION"
-          echo "${{ matrix.pakcages }}最新版本: $New_PKG_VERSION"
-              
-          if [ "$Old_PKG_VERSION" = "$New_PKG_VERSION" ];then echo "status=failure" >> $GITHUB_OUTPUT; echo "${{ matrix.pakcages }}版本为最新版本$New_PKG_VERSION,无需更新"; else echo "New_PKG_VERSION=$New_PKG_VERSION" >> $GITHUB_OUTPUT;  echo "status=success" >> $GITHUB_OUTPUT; fi;
+          is_continue=true
+          
+          if [ "${{ github.event.inputs.is_update_geodata }}" != "true" ] && [ "${{ matrix.pakcages }}" = "v2ray-geoip" ]; then
+            is_continue=false
+          fi
+          if [ "${{ github.event.inputs.is_update_geodata }}" != "true" ] && [ "${{ matrix.pakcages }}" = "v2ray-geosite" ]; then
+            is_continue=false
+          fi
+          if [ "${{ github.event.inputs.is_update_sing-box }}" != "true" ] && [ "${{ matrix.pakcages }}" = "sing-box" ]; then
+            is_continue=false
+          fi
+
+          if [ "$is_continue" = "true" ]; then
+            cd && cd work/openwrt-passwall-packages/openwrt-passwall-packages/${{ matrix.folder }} 
+            Old_PKG_VERSION=$(sed -n '${{ matrix.version_line }}p' Makefile | awk -F '=' '{print $2}')
+            New_PKG_VERSION=$(${{ matrix.release_api_command }})
+            echo "${{ matrix.pakcages }}目前版本: $Old_PKG_VERSION"
+            echo "${{ matrix.pakcages }}最新版本: $New_PKG_VERSION"
+            if [ "$Old_PKG_VERSION" = "$New_PKG_VERSION" ]; then 
+              echo "status=failure" >> $GITHUB_OUTPUT; 
+              echo "${{ matrix.pakcages }}版本为最新版本$New_PKG_VERSION,无需更新"; 
+            else 
+              echo "New_PKG_VERSION=$New_PKG_VERSION" >> $GITHUB_OUTPUT;  
+              echo "status=success" >> $GITHUB_OUTPUT;
+            fi
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT;
+          fi
+
 
       - name: Update ${{ matrix.pakcages }}
         id: update
