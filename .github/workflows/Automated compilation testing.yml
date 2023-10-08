@@ -1,0 +1,67 @@
+#
+# Copyright (c) 2022-2023 SMALLPROGRAM <https://github.com/smallprogram>
+# Description: Automated compilation testing
+#
+
+name: Test Build
+
+on:
+  push:
+    branches:
+        - main
+  pull_request:
+    types: [opened, reopened]
+    paths-ignore:
+        - '**.md'
+
+jobs:
+  build:
+    name: test ${{ matrix.arch }} build
+    runs-on: ubuntu-latest
+    strategy:
+        fail-fast: false
+        matrix:
+          include:
+            - arch: arm_cortex-a9_vfpv3-d16
+              target: mvebu-cortexa9
+  
+            - arch: mips_24kc
+              target: ath79-generic
+  
+            - arch: mipsel_24kc
+              target: mt7621
+  
+            - arch: powerpc_464fp
+              target: apm821xx-nand
+  
+            - arch: powerpc_8548
+              target: mpc85xx-p1010
+  
+            - arch: aarch64_cortex-a53
+              target: mvebu-cortexa53
+  
+            - arch: arm_cortex-a15_neon-vfpv4
+              target: armvirt-32
+  
+            - arch: i386_pentium-mmx
+              target: x86-geode
+  
+            - arch: x86_64
+              target: x86-64
+
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Build
+        uses: openwrt/gh-action-sdk@main
+        env:
+          ARCH: ${{ matrix.arch }}
+
+      - name: Store packages
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.arch}}-packages
+          path: bin/packages/${{ matrix.arch }}/packages/*.ipk
