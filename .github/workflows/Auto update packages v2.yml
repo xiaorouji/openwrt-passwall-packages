@@ -41,7 +41,7 @@ jobs:
 
 
       - name: Delete workflow runs
-        uses: Mattraks/delete-workflow-runs@main
+        uses: zijieKwok/delete-workflow-runs@main
         with:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
@@ -49,7 +49,7 @@ jobs:
           keep_minimum_runs: 0
         
       - name: SSH connection to Actions
-        uses: mxschmitt/action-tmate@v3.13
+        uses: zijieKwok/action-tmate@v3.13
         if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
 
   job_auto_update_packages:
