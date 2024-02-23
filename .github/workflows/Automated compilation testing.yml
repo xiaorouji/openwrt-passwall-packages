@@ -86,9 +86,13 @@ jobs:
       id: detect-changes
       run: |
         git fetch origin main
-        CHANGED_DIRS=$(git diff --name-only ${{ github.sha }} origin/main | awk -F'/' '{print $1}' | uniq)
+        CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | awk -F'/' '{print $1}' | uniq)
         echo "Changed directories: $CHANGED_DIRS"
-        echo "dirs=$CHANGED_DIRS" >> GITHUB_OUTPUT
+        if [ -z "$CHANGED_DIRS" ]; then
+          echo "dirs=" >> $GITHUB_ENV
+        else
+          echo "dirs=$CHANGED_DIRS" >> $GITHUB_ENV
+        fi
 
     - name: Initialization ${{ matrix.platform }} compile environment
       run: |
@@ -141,17 +145,17 @@ jobs:
       id: compile
       run: |
         cd sdk
-        CHANGED_DIRS="${{ steps.detect-changes.outputs.dirs }}"
-        if [ -z "$CHANGED_DIRS" ]; then
+        if [ -z "${{ env.dirs }}" ]; then
           echo "No changes detected in passwall_packages"
           exit 0
         fi
+        CHANGED_DIRS=${{ env.dirs }}
         for DIR in $CHANGED_DIRS; do
-          if [ -d "feeds/passwall_packages/$DIR" ]; then
+          if [ -d "package/$DIR" ]; then
             echo "Compiling changes in directory: $DIR"
-            make package/feeds/passwall_packages/$DIR/compile -j$(nproc) 2>/dev/null
+            make package/$DIR/compile -j$(nproc) || exit 1
           else
-            echo "Directory $DIR does not exist under feeds/passwall_packages"
+            echo "Directory $DIR does not exist"
           fi
         done
 
