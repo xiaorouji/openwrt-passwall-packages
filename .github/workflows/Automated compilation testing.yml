@@ -8,13 +8,15 @@ name: Test Build
 on:
   push:
     branches:
-        - main
+      - main
     paths-ignore:
       - '**.md'
+      - '.github/**'
   pull_request:
     types: [opened, reopened]
     paths-ignore:
-        - '**.md'
+      - '**.md'
+      - '.github/**'
 env:
   TZ: Asia/Shanghai
   packages: ${{ github.repository }}
@@ -81,6 +83,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@main
+      with:
+        fetch-depth: 0 
 
     - name: Detect Changed Directories
       id: detect-changes
