@@ -150,7 +150,7 @@ jobs:
           echo "No changes detected in passwall_packages"
           exit 0
         fi
-        CHANGED_DIRS=${{ steps.detect-changes.outputs.changed_dirs }}
+        CHANGED_DIRS="${{ steps.detect-changes.outputs.changed_dirs }}"
         for DIR in $CHANGED_DIRS; do
           if [ -d "package/feeds/passwall_packages/$DIR" ]; then
             echo "Compiling changes in directory: $DIR"
