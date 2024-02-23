@@ -90,13 +90,10 @@ jobs:
       id: detect-changes
       run: |
         git fetch origin main
-        CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | awk -F'/' '{print $1}' | uniq)
+        CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | awk -F'/' '{print $1}' | sort -u | tr '\n' ',')
         echo "Changed directories: $CHANGED_DIRS"
-        if [ -z "$CHANGED_DIRS" ]; then
-          echo "dirs=" >> $GITHUB_ENV
-        else
-          echo "dirs=$CHANGED_DIRS" >> $GITHUB_ENV
-        fi
+        CHANGED_DIRS=${CHANGED_DIRS%,}
+        echo "changed_dirs=$CHANGED_DIRS" >> $GITHUB_OUTPUT
 
     - name: Initialization ${{ matrix.platform }} compile environment
       run: |
@@ -149,11 +146,11 @@ jobs:
       id: compile
       run: |
         cd sdk
-        if [ -z "${{ env.dirs }}" ]; then
+        if [ -z "${{ steps.detect-changes.outputs.changed_dirs }}" ]; then
           echo "No changes detected in passwall_packages"
           exit 0
         fi
-        CHANGED_DIRS=${{ env.dirs }}
+        CHANGED_DIRS=${{ steps.detect-changes.outputs.changed_dirs }}
         for DIR in $CHANGED_DIRS; do
           if [ -d "package/feeds/passwall_packages/$DIR" ]; then
             echo "Compiling changes in directory: $DIR"
