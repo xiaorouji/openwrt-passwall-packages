@@ -9,59 +9,149 @@ on:
   push:
     branches:
         - main
+    paths-ignore:
+      - '**.md'
   pull_request:
     types: [opened, reopened]
     paths-ignore:
         - '**.md'
+env:
+  TZ: Asia/Shanghai
+  packages: ${{ github.repository }}
 
 jobs:
-  build:
-    name: test ${{ matrix.arch }} build
+  job_auto_compile:
     runs-on: ubuntu-latest
+    name: test build (${{ matrix.platform }})
     strategy:
-        fail-fast: false
-        matrix:
-          include:
-            - arch: arm_cortex-a9_vfpv3-d16
-              target: mvebu-cortexa9
-  
-            - arch: mips_24kc
-              target: ath79-generic
-  
-            - arch: mipsel_24kc
-              target: mt7621
-  
-            - arch: powerpc_464fp
-              target: apm821xx-nand
-  
-            - arch: powerpc_8548
-              target: mpc85xx-p1010
-  
-            - arch: aarch64_cortex-a53
-              target: mvebu-cortexa53
-  
-            - arch: arm_cortex-a15_neon-vfpv4
-              target: armvirt-32
-  
-            - arch: i386_pentium-mmx
-              target: x86-geode
-  
-            - arch: x86_64
-              target: x86-64
+      fail-fast: false
+      matrix:
+        include:
+          - platform: x86_64
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/x86/64/openwrt-sdk-23.05.0-x86-64_gcc-12.3.0_musl.Linux-x86_64.tar.xz
 
+          - platform: aarch64_generic
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/rockchip/armv8/openwrt-sdk-23.05.0-rockchip-armv8_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+          - platform: aarch64_cortex-a53
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/mvebu/cortexa53/openwrt-sdk-23.05.0-mvebu-cortexa53_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+          - platform: aarch64_cortex-a72
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/mvebu/cortexa72/openwrt-sdk-23.05.0-mvebu-cortexa72_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+          - platform: arm_cortex-a7
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/mediatek/mt7629/openwrt-sdk-23.05.0-mediatek-mt7629_gcc-12.3.0_musl_eabi.Linux-x86_64.tar.xz
+
+          - platform: arm_cortex-a7_neon-vfpv4
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/sunxi/cortexa7/openwrt-sdk-23.05.0-sunxi-cortexa7_gcc-12.3.0_musl_eabi.Linux-x86_64.tar.xz
+
+          - platform: arm_cortex-a8_vfpv3
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/sunxi/cortexa8/openwrt-sdk-23.05.0-sunxi-cortexa8_gcc-12.3.0_musl_eabi.Linux-x86_64.tar.xz
+
+          - platform: arm_cortex-a9
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/bcm53xx/generic/openwrt-sdk-23.05.0-bcm53xx-generic_gcc-12.3.0_musl_eabi.Linux-x86_64.tar.xz
+
+          - platform: arm_cortex-a9_neon
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/zynq/generic/openwrt-sdk-23.05.0-zynq-generic_gcc-12.3.0_musl_eabi.Linux-x86_64.tar.xz
+
+          - platform: arm_cortex-a9_vfpv3-d16
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/mvebu/cortexa9/openwrt-sdk-23.05.0-mvebu-cortexa9_gcc-12.3.0_musl_eabi.Linux-x86_64.tar.xz
+
+          - platform: arm_cortex-a15_neon-vfpv4
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/ipq806x/generic/openwrt-sdk-23.05.0-ipq806x-generic_gcc-12.3.0_musl_eabi.Linux-x86_64.tar.xz
+
+          - platform: mips_24kc
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/ath79/generic/openwrt-sdk-23.05.0-ath79-generic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+          - platform: mips_4kec
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/realtek/rtl838x/openwrt-sdk-23.05.0-realtek-rtl838x_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+          - platform: mips_mips32
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/bcm63xx/generic/openwrt-sdk-23.05.0-bcm63xx-generic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+          - platform: mipsel_24kc
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/ramips/rt288x/openwrt-sdk-23.05.0-ramips-rt288x_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+          - platform: mipsel_74kc
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/ramips/rt3883/openwrt-sdk-23.05.0-ramips-rt3883_gcc-12.3.0_musl.Linux-x86_64.tar.xz
+
+          - platform: mipsel_mips32
+            url_sdk: https://downloads.openwrt.org/releases/23.05.0/targets/bcm47xx/generic/openwrt-sdk-23.05.0-bcm47xx-generic_gcc-12.3.0_musl.Linux-x86_64.tar.xz
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+    - name: Checkout code
+      uses: actions/checkout@main
 
-      - name: Build
-        uses: openwrt/gh-action-sdk@main
-        env:
-          ARCH: ${{ matrix.arch }}
+    - name: Detect Changed Directories
+      id: detect-changes
+      run: |
+        git fetch origin main
+        CHANGED_DIRS=$(git diff --name-only ${{ github.sha }} origin/main | awk -F'/' '{print $1}' | uniq)
+        echo "Changed directories: $CHANGED_DIRS"
+        echo "dirs=$CHANGED_DIRS" >> GITHUB_OUTPUT
 
-      - name: Store packages
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ matrix.arch}}-packages
-          path: bin/packages/${{ matrix.arch }}/packages/*.ipk
+    - name: Initialization ${{ matrix.platform }} compile environment
+      run: |
+        docker rmi `docker images -q`
+        sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+        echo "install packages!!!!!!"
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(curl -fsSL https://github.com/smallprogram/OpenWrtAction/raw/main/diy_script/official_dependence)
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+
+    - name: ${{ matrix.platform }} sdk download
+      run: |
+        wget ${{ matrix.url_sdk }}
+        file_name=$(echo ${{matrix.url_sdk}} | awk -F/ '{print $NF}')
+        mkdir sdk && tar -xJf $file_name -C ./sdk --strip-components=1
+        cd sdk
+
+    - name: SSH connection to Actions
+      uses: mxschmitt/action-tmate@v3.13
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+
+    - name: ${{ matrix.platform }} feeds configuration packages
+      run: |
+        cd sdk
+        echo "src-git base https://github.com/openwrt/openwrt.git;openwrt-23.05" > feeds.conf
+        echo "src-git packages https://github.com/openwrt/packages.git;openwrt-23.05" >> feeds.conf
+        echo "src-git luci https://github.com/openwrt/luci.git;openwrt-23.05" >> feeds.conf
+        echo "src-git routing https://git.openwrt.org/feed/routing.git;openwrt-23.05"  >> feeds.conf
+        echo "src-git passwall_packages https://github.com/${{ env.packages }}.git;main" >> feeds.conf
+
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a -f -p passwall_packages
+
+        echo "CONFIG_ALL_NONSHARED=n" > .config
+        echo "CONFIG_ALL_KMODS=n" >> .config
+        echo "CONFIG_ALL=n" >> .config
+        echo "CONFIG_AUTOREMOVE=n" >> .config
+        echo "CONFIG_SIGNED_PACKAGES=n" >> .config
+        make defconfig
+
+
+    - name: ${{ matrix.platform }} download
+      run: |
+        cd sdk
+        make download -j8
+        find dl -size -1024c -exec ls -l {} \;
+
+    - name: Compile Changed Packages
+      id: compile
+      run: |
+        cd sdk
+        CHANGED_DIRS="${{ steps.detect-changes.outputs.dirs }}"
+        if [ -z "$CHANGED_DIRS" ]; then
+          echo "No changes detected in passwall_packages"
+          exit 0
+        fi
+        for DIR in $CHANGED_DIRS; do
+          if [ -d "feeds/passwall_packages/$DIR" ]; then
+            echo "Compiling changes in directory: $DIR"
+            make package/feeds/passwall_packages/$DIR/compile -j$(nproc) 2>/dev/null
+          else
+            echo "Directory $DIR does not exist under feeds/passwall_packages"
+          fi
+        done
+
