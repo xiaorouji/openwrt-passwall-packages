@@ -155,11 +155,12 @@ jobs:
         fi
         CHANGED_DIRS=${{ env.dirs }}
         for DIR in $CHANGED_DIRS; do
-          if [ -d "package/$DIR" ]; then
+          if [ -d "package/feeds/passwall_packages/$DIR" ]; then
             echo "Compiling changes in directory: $DIR"
-            make package/$DIR/compile -j$(nproc) || exit 1
+            make package/feeds/passwall_packages/$DIR/compile -j$(nproc) || exit 1
           else
             echo "Directory $DIR does not exist"
+            exit 1
           fi
         done
 
