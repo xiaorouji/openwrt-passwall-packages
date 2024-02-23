@@ -13,7 +13,6 @@ on:
       - '**.md'
       - '.github/**'
   pull_request:
-    types: [opened, reopened, review_requested]
     paths-ignore:
       - '**.md'
       - '.github/**'
