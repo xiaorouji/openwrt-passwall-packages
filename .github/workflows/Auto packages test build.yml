@@ -1,0 +1,71 @@
+#
+# Copyright (c) 2022-2024 SMALLPROGRAM <https://github.com/smallprogram>
+# Description: Auto packages test build
+#
+
+name: "Auto packages test build"
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  test_build:
+    name: Test ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm_cortex-a9_vfpv3-d16
+            target: mvebu-cortexa9
+            
+          - arch: mips_24kc
+            target: ath79-generic
+
+          - arch: mipsel_24kc
+            target: mt7621
+
+          - arch: aarch64_cortex-a53
+            target: mvebu-cortexa53
+
+          - arch: arm_cortex-a15_neon-vfpv4
+            target: armvirt-32
+
+          - arch: i386_pentium-mmx
+            target: x86-geode
+
+          - arch: x86_64
+            target: x86-64
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Determine branch
+        run: |
+            BRANCH="${GITHUB_BASE_REF#refs/heads/}"
+            echo "Building for $BRANCH"
+
+            ROOTS=$(find . -name Makefile | grep -v ".*/src/Makefile" | sed -e 's@./\(.*\)/Makefile@\1/@')
+            CHANGES=$(git diff --diff-filter=d --name-only origin/$BRANCH)
+
+            for ROOT in $ROOTS; do
+              for CHANGE in $CHANGES; do
+                if [[ "$CHANGE" == "$ROOT"* ]]; then
+                    PACKAGES+=$(echo "$ROOT" | sed -e 's@\(.*\)/@\1 @')
+                    break
+                fi
+              done
+            done
+
+            PACKAGES="${PACKAGES:-luci-app-passwall}"
+            echo "Building $PACKAGES"
+
+      - name: Build
+        uses: openwrt/gh-action-sdk@main
+        env:
+            ARCH: ${{ matrix.arch }}
+            V: s
