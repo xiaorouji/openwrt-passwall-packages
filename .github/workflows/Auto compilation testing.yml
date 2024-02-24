@@ -91,8 +91,8 @@ jobs:
           git fetch origin main:refs/remotes/origin/main
           BASE_SHA=${{ github.event.pull_request.base.sha }}
           HEAD_SHA=${{ github.sha }}
-          echo "pull_request_head:$BASE_SHA"
-          echo "main_head:$HEAD_SHA"
+          echo "pull_requert_bash_sha:$BASE_SHA"
+          echo "merge_sha:$HEAD_SHA"
           CHANGED_DIRS=$(git diff --name-only $BASE_SHA $HEAD_SHA | awk -F'/' '{print $1}' | sort -u | tr '\n' ',')
           echo "Changed directories: $CHANGED_DIRS"
           CHANGED_DIRS=${CHANGED_DIRS%,}
