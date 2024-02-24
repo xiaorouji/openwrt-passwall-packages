@@ -61,6 +61,8 @@ jobs:
             folder: brook
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/txthinking/brook/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/txthinking/brook/tar.gz/v
             file_name:
@@ -69,6 +71,8 @@ jobs:
             folder: chinadns-ng
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/zfl9/chinadns-ng/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/zfl9/chinadns-ng/tar.gz/
             file_name:
@@ -77,6 +81,8 @@ jobs:
             folder: hysteria
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/apernet/hysteria/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/apernet/hysteria/tar.gz/app/v
             file_name:
@@ -85,6 +91,8 @@ jobs:
             folder: ipt2socks
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/zfl9/ipt2socks/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/zfl9/ipt2socks/tar.gz/v
             file_name:
@@ -93,6 +101,8 @@ jobs:
             folder: microsocks
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/rofl0r/microsocks/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/rofl0r/microsocks/tar.gz/v
             file_name:
@@ -101,6 +111,8 @@ jobs:
             folder: shadowsocks-rust
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/shadowsocks/shadowsocks-rust/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/shadowsocks/shadowsocks-rust/tar.gz/v
             file_name:
@@ -109,6 +121,8 @@ jobs:
             folder: sing-box
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/SagerNet/sing-box/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/SagerNet/sing-box/tar.gz/v
             file_name:
@@ -117,6 +131,8 @@ jobs:
             folder: trojan
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/trojan-gfw/trojan/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/trojan-gfw/trojan/tar.gz/v
             file_name:
@@ -125,6 +141,8 @@ jobs:
             folder: trojan-go
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/p4gefau1t/trojan-go/tar.gz/v
             file_name:
@@ -133,6 +151,8 @@ jobs:
             folder: v2ray-core
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/v2fly/v2ray-core/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/v2fly/v2ray-core/tar.gz/v
             file_name:
@@ -141,6 +161,8 @@ jobs:
             folder: v2ray-plugin
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/teddysun/v2ray-plugin/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/teddysun/v2ray-plugin/tar.gz/v
             file_name:
@@ -149,6 +171,8 @@ jobs:
             folder: xray-core
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/XTLS/Xray-core/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/XTLS/Xray-core/tar.gz/v
             file_name:
@@ -157,6 +181,8 @@ jobs:
             folder: xray-plugin
             version_head: PKG_VERSION:=
             hash_head: PKG_HASH:=
+            version_line:
+            hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/teddysun/xray-plugin/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/teddysun/xray-plugin/tar.gz/v
             file_name: 
@@ -165,16 +191,19 @@ jobs:
             folder: v2ray-geodata
             version_head: GEOIP_VER:=
             hash_head: \  HASH:=
-            release_api_command: curl -sL "https://api.github.com/repos/v2fly/geoip/releases" | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'
+            version_line:
+            hash_line: 21
+            release_api_command: curl -sL "https://api.github.com/repos/v2fly/geoip/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://github.com/v2fly/geoip/releases/download/
             file_name: /geoip.dat
-
 
           - pakcages: v2ray-geosite
             folder: v2ray-geodata
             version_head: GEOSITE_VER:=
             hash_head: \  HASH:=
-            release_api_command: curl -sL "https://api.github.com/repos/v2fly/domain-list-community/releases" | grep "tag_name" | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//g;s/ //g'
+            version_line:
+            hash_line: 30
+            release_api_command: curl -sL "https://api.github.com/repos/v2fly/domain-list-community/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://github.com/v2fly/domain-list-community/releases/download/
             file_name: /dlc.dat
 
@@ -201,8 +230,12 @@ jobs:
           fi
 
           if [ "$is_continue" = "true" ]; then
-            cd && cd $GITHUB_WORKSPACE/${{ matrix.folder }} 
-            Old_PKG_VERSION=$(sed -n '/^${{ matrix.version_head }}/p' Makefile | awk -F '=' '{print $2}')
+            cd && cd $GITHUB_WORKSPACE/${{ matrix.folder }}
+            if [ ! -n "${{ matrix.version_line }}" ] ; then
+              Old_PKG_VERSION=$(sed -n '/^${{ matrix.version_head }}/p' Makefile | awk -F '=' '{print $2}');
+            else
+              Old_PKG_VERSION=$(sed -n '${{ matrix.version_line }}p' Makefile | awk -F '=' '{print $2}');
+            fi
             New_PKG_VERSION=$(${{ matrix.release_api_command }})
             echo "${{ matrix.pakcages }}目前版本: $Old_PKG_VERSION"
             echo "${{ matrix.pakcages }}最新版本: $New_PKG_VERSION"
@@ -224,7 +257,11 @@ jobs:
         run: |
           cd && cd $GITHUB_WORKSPACE/${{ matrix.folder }}
           New_PKG_VERSION=${{ steps.check.outputs.New_PKG_VERSION }}
-          sed -i "/^${{ matrix.version_head }}/c\${{ matrix.version_head }}$New_PKG_VERSION" Makefile
+          if [ ! -n "${{ matrix.version_line }}" ] ; then
+            sed -i "/^${{ matrix.version_head }}/c\${{ matrix.version_head }}$New_PKG_VERSION" Makefile;
+          else
+            sed -i "${{ matrix.version_line }}c ${{ matrix.version_head }}$New_PKG_VERSION" Makefile;
+          fi
           cd && cd packages && mkdir -p ${{ matrix.pakcages }} && cd ${{ matrix.pakcages }}
           wget -P / ${{ matrix.release_download_url }}$New_PKG_VERSION${{ matrix.file_name }}
           file_name=${{ matrix.file_name }}
@@ -233,7 +270,11 @@ jobs:
 
           if [ ! -n "${{ matrix.file_name }}" ]; then PKG_HASH=$(sha256sum $is_v$New_PKG_VERSION) && PKG_HASH=${PKG_HASH%% *}; else PKG_HASH=$(sha256sum ${file_name##*/}) && PKG_HASH=${PKG_HASH%% *}; fi;
           cd && cd $GITHUB_WORKSPACE/${{ matrix.folder }} 
-          sed -i "/^${{ matrix.hash_head }}/c\${{ matrix.hash_head }}$PKG_HASH" Makefile
+          if [ ! -n "${{ matrix.hash_line }}" ] ; then
+            sed -i "/^${{ matrix.hash_head }}/c\${{ matrix.hash_head }}$PKG_HASH" Makefile;
+          else
+            sed -i "${{ matrix.hash_line }}c ${{ matrix.hash_head }}$PKG_HASH" Makefile;
+          fi
           echo "已更新${{ matrix.pakcages }}版本到: $New_PKG_VERSION"
           echo "${{ matrix.pakcages }} Hash:$PKG_HASH"
           cd && cd packages
