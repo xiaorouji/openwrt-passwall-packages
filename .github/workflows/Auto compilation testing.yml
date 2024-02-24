@@ -88,11 +88,15 @@ jobs:
     - name: Detect Changed Directories
       id: detect-changes
       run: |
-        git fetch origin main
-        CHANGED_DIRS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | awk -F'/' '{print $1}' | sort -u | tr '\n' ',')
-        echo "Changed directories: $CHANGED_DIRS"
-        CHANGED_DIRS=${CHANGED_DIRS%,}
-        echo "changed_dirs=$CHANGED_DIRS" >> $GITHUB_OUTPUT
+          git fetch origin main:refs/remotes/origin/main
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          HEAD_SHA=${{ github.sha }}
+          echo "pull_requert_bash_sha:$BASE_SHA"
+          echo "merge_sha:$HEAD_SHA"
+          CHANGED_DIRS=$(git diff --name-only $BASE_SHA $HEAD_SHA | awk -F'/' '{print $1}' | sort -u | tr '\n' ',')
+          echo "Changed directories: $CHANGED_DIRS"
+          CHANGED_DIRS=${CHANGED_DIRS%,}
+          echo "changed_dirs=$CHANGED_DIRS" >> $GITHUB_OUTPUT
 
     - name: Initialization ${{ matrix.platform }} compile environment
       run: |
