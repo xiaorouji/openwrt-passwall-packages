@@ -1,0 +1,24 @@
+From eebfdb7aeae3f19bc70dfb81dc7921fab82eb4b7 Mon Sep 17 00:00:00 2001
+From: Beginner-Go <70857188+Beginner-Go@users.noreply.github.com>
+Date: Mon, 26 Feb 2024 15:50:36 +0000
+Subject: [PATCH] fix go 1.21 build error
+
+---
+ go.mod | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/go.mod b/go.mod
+index 5445c26..3f81cbc 100644
+--- a/go.mod
++++ b/go.mod
+@@ -1,6 +1,6 @@
+ module github.com/xtls/xray-core
+ 
+-go 1.22
++go 1.21.5
+ 
+ require (
+ 	github.com/ghodss/yaml v1.0.1-0.20220118164431-d8423dcdf344
+-- 
+2.34.1
+
