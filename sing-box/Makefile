@@ -46,7 +46,7 @@ define Package/$(PKG_NAME)/description
   Shadowsocks, ShadowTLS, Tor, trojan, VLess, VMess, WireGuard and so on.
 endef
 
-GO_PKG_TARGET_VARS:=$(filter-out CGO_ENABLED=%,$(GO_PKG_TARGET_VARS)) CGO_ENABLED=0
+GO_PKG_TARGET_VARS:=$(filter-out CGO_ENABLED=%,$(GO_PKG_TARGET_VARS)) CGO_ENABLED=1
 
 define Package/$(PKG_NAME)/config
   menu "Customizing build tags"
