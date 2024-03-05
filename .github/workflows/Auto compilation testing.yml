@@ -85,18 +85,32 @@ jobs:
       with:
         fetch-depth: 0 
 
+    - name: Setup variables
+      run: |
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          echo "BASE_SHA=$(git merge-base refs/remotes/origin/${{ github.base_ref }} ${{ github.event.pull_request.head.sha }})" >> $GITHUB_ENV
+          echo "HEAD_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+          echo "is pull_request event!"
+          echo "BASE_SHA:$BASE_SHA"
+          echo "HEAD_SHA:$HEAD_SHA"
+        elif [ "${{ github.event_name }}" == "push" ]; then
+          # Use `github.event.before` as the base SHA for push events to capture all changes in the push
+          echo "BASE_SHA=${{ github.event.before }}" >> $GITHUB_ENV
+          echo "HEAD_SHA=${{ github.event.after }}" >> $GITHUB_ENV
+          echo "is push event!"
+          echo "BASE_SHA:$BASE_SHA"
+          echo "HEAD_SHA:$HEAD_SHA"
+        fi
+
     - name: Detect Changed Directories
       id: detect-changes
       run: |
-          git fetch origin main:refs/remotes/origin/main
-          BASE_SHA=${{ github.event.pull_request.base.sha }}
-          HEAD_SHA=${{ github.sha }}
-          echo "pull_requert_bash_sha:$BASE_SHA"
-          echo "merge_sha:$HEAD_SHA"
+          echo "Base SHA: $BASE_SHA"
+          echo "Head SHA: $HEAD_SHA"
           CHANGED_DIRS=$(git diff --name-only $BASE_SHA $HEAD_SHA | awk -F'/' '{print $1}' | sort -u | tr '\n' ',')
           echo "Changed directories: $CHANGED_DIRS"
           CHANGED_DIRS=${CHANGED_DIRS%,}
-          echo "changed_dirs=$CHANGED_DIRS" >> $GITHUB_OUTPUT
+          echo "CHANGED_DIRS=$CHANGED_DIRS" >> $GITHUB_ENV
 
     - name: Initialization ${{ matrix.platform }} compile environment
       run: |
@@ -149,11 +163,10 @@ jobs:
       id: compile
       run: |
         cd sdk
-        if [ -z "${{ steps.detect-changes.outputs.changed_dirs }}" ]; then
+        if [ -z "$CHANGED_DIRS" ]; then
           echo "No changes detected in passwall_packages"
           exit 0
         fi
-        CHANGED_DIRS="${{ steps.detect-changes.outputs.changed_dirs }}"
         IFS=',' read -ra DIRS <<< "$CHANGED_DIRS"
         for DIR in "${DIRS[@]}"; do
           if [ -d "package/feeds/passwall_packages/$DIR" ]; then
