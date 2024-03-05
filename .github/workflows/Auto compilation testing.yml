@@ -6,12 +6,6 @@
 name: Auto compilation testing
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-      - '.github/**'
   pull_request:
     paths-ignore:
       - '**.md'
@@ -88,12 +82,11 @@ jobs:
     - name: Detect Changed Directories
       id: detect-changes
       run: |
-          git fetch origin main:refs/remotes/origin/main
-          BASE_SHA=${{ github.event.pull_request.base.sha }}
-          HEAD_SHA=${{ github.sha }}
-          echo "pull_requert_bash_sha:$BASE_SHA"
-          echo "merge_sha:$HEAD_SHA"
-          CHANGED_DIRS=$(git diff --name-only $BASE_SHA $HEAD_SHA | awk -F'/' '{print $1}' | sort -u | tr '\n' ',')
+          git fetch origin ${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+          BASE_SHA=$(git merge-base refs/remotes/origin/${{ github.base_ref }} ${{ github.sha }})
+          echo "pull_request_base_sha:$BASE_SHA"
+          echo "merge_sha:${{ github.sha }}"
+          CHANGED_DIRS=$(git diff --name-only $BASE_SHA ${{ github.sha }} | awk -F'/' '{print $1}' | sort -u | tr '\n' ',')
           echo "Changed directories: $CHANGED_DIRS"
           CHANGED_DIRS=${CHANGED_DIRS%,}
           echo "changed_dirs=$CHANGED_DIRS" >> $GITHUB_OUTPUT
