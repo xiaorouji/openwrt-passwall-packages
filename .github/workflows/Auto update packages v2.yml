@@ -55,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pakcages: [brook, chinadns-ng, hysteria, ipt2socks, microsocks, shadowsocks-rust, sing-box, trojan, trojan-go, v2ray-core, v2ray-plugin, xray-core, xray-plugin, v2ray-geoip, v2ray-geosite]
+        pakcages: [brook, hysteria, ipt2socks, microsocks, shadowsocks-rust, sing-box, trojan, trojan-go, v2ray-core, v2ray-plugin, xray-core, xray-plugin, v2ray-geoip, v2ray-geosite]
         include:
           - pakcages: brook
             folder: brook
@@ -67,15 +67,15 @@ jobs:
             release_download_url: https://codeload.github.com/txthinking/brook/tar.gz/v
             file_name:
 
-          - pakcages: chinadns-ng
-            folder: chinadns-ng
-            version_head: PKG_VERSION:=
-            hash_head: PKG_HASH:=
-            version_line:
-            hash_line:
-            release_api_command: curl -sL "https://api.github.com/repos/zfl9/chinadns-ng/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
-            release_download_url: https://codeload.github.com/zfl9/chinadns-ng/tar.gz/
-            file_name:
+          # - pakcages: chinadns-ng
+          #   folder: chinadns-ng
+          #   version_head: PKG_VERSION:=
+          #   hash_head: PKG_HASH:=
+          #   version_line:
+          #   hash_line:
+          #   release_api_command: curl -sL "https://api.github.com/repos/zfl9/chinadns-ng/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+          #   release_download_url: https://codeload.github.com/zfl9/chinadns-ng/tar.gz/
+          #   file_name:
 
           - pakcages: hysteria
             folder: hysteria
