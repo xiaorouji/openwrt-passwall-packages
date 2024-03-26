@@ -5,29 +5,27 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=v2ray-geodata
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_RELEASE:=$(shell date "+%Y%m%d%H%M%S")-1
 
 PKG_LICENSE_FILES:=LICENSE
 PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
 include $(INCLUDE_DIR)/package.mk
 
-GEOIP_VER:=202402220038
-GEOIP_FILE:=geoip.dat.$(GEOIP_VER)
+GEOIP_FILE:=geoip.dat
 define Download/geoip
-  URL:=https://github.com/v2fly/geoip/releases/download/$(GEOIP_VER)/
-  URL_FILE:=geoip.dat
+  URL:=https://github.com/v2fly/geoip/releases/latest/download/
+  URL_FILE:=geoip-only-cn-private.dat
   FILE:=$(GEOIP_FILE)
-  HASH:=331c5031528f577dde3d63681d32a15693aace4e38095d40dbe3f751e0db5536
+  HASH:=skip
 endef
 
-GEOSITE_VER:=20240221053250
-GEOSITE_FILE:=dlc.dat.$(GEOSITE_VER)
+GEOSITE_FILE:=geosite.dat
 define Download/geosite
-  URL:=https://github.com/v2fly/domain-list-community/releases/download/$(GEOSITE_VER)/
+  URL:=https://github.com/v2fly/domain-list-community/releases/latest/download/
   URL_FILE:=dlc.dat
   FILE:=$(GEOSITE_FILE)
-  HASH:=d2ef9bd9cac2678088f5494b888bf9eecdad385dc2b5689e6c7d56e4d97173a3
+  HASH:=skip
 endef
 
 define Package/v2ray-geodata/template
@@ -41,14 +39,14 @@ endef
 define Package/v2ray-geoip
   $(call Package/v2ray-geodata/template)
   TITLE:=GeoIP List for V2Ray
-  VERSION:=$(GEOIP_VER)-$(PKG_RELEASE)
+  VERSION:=$(PKG_RELEASE)
   LICENSE:=CC-BY-SA-4.0
 endef
 
 define Package/v2ray-geosite
   $(call Package/v2ray-geodata/template)
   TITLE:=Geosite List for V2Ray
-  VERSION:=$(GEOSITE_VER)-$(PKG_RELEASE)
+  VERSION:=$(PKG_RELEASE)
   LICENSE:=MIT
 endef
 
