@@ -6,7 +6,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=dns2tcp
 PKG_VERSION:=1.1.1
-PKG_RELEASE:=2
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/zfl9/dns2tcp/tar.gz/v$(PKG_VERSION)?
@@ -17,7 +17,8 @@ PKG_LICENSE:=AGPL-3.0-only
 PKG_LICENSE_FILES:=LICENSE
 
 PKG_BUILD_PARALLEL:=1
-PKG_BUILD_FLAGS:=no-mips16 gc-sections lto
+PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -29,7 +30,7 @@ define Package/dns2tcp
   URL:=https://github.com/zfl9/dns2tcp
 endef
 
-TARGET_CFLAGS+= $(FPIC)
+TARGET_CFLAGS+= $(FPIC) -Wl,--gc-sections -flto
 MAKE_FLAGS+= \
 	CFLAGS="-std=c99 $(TARGET_CFLAGS)" \
 	EVCFLAGS="$(TARGET_CFLAGS)"
