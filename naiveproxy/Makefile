@@ -1,46 +1,76 @@
-# SPDX-License-Identifier: GPL-3.0-only
-#
-# Copyright (C) 2021 ImmortalWrt.org
-
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=naiveproxy
-PKG_VERSION:=125.0.6422.35-1
+PKG_VERSION:=128.0.6613.40-1
 PKG_RELEASE:=1
 
-PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://codeload.github.com/klzgrad/naiveproxy/tar.gz/v$(PKG_VERSION)?
-PKG_HASH:=fd1fdab08aa00f19fb6ca1cb80cc132ab5a8d2bd3c95fa4ba41b3d79fbc88ebd
+ARCH_PREBUILT:=$(ARCH_PACKAGES)
+
+# intel 80386 & riscv64 & cortex-a76
+ifeq ($(ARCH_PREBUILT),aarch64_cortex-a76)
+  ARCH_PREBUILT:=aarch64_generic
+else ifeq ($(ARCH_PREBUILT),i386_pentium-mmx)
+  ARCH_PREBUILT:=x86
+else ifeq ($(ARCH_PREBUILT),i386_pentium4)
+  ARCH_PREBUILT:=x86
+else ifeq ($(ARCH_PREBUILT),riscv64_riscv64)
+  ARCH_PREBUILT:=riscv64
+endif
+
+PKG_SOURCE:=naiveproxy-v$(PKG_VERSION)-openwrt-$(ARCH_PREBUILT).tar.xz
+PKG_SOURCE_URL:=https://github.com/klzgrad/naiveproxy/releases/download/v$(PKG_VERSION)/
+
+ifeq ($(ARCH_PREBUILT),aarch64_cortex-a53)
+  PKG_HASH:=feaefc5e55d50c4ca9b76ea322dd55c68759708f10f026ea446d30ba370c39fd
+else ifeq ($(ARCH_PREBUILT),aarch64_cortex-a72)
+  PKG_HASH:=aa7f5b0297d1f66210752457eee5bdb564872fe532b5c62309309f8d77abe3b8
+else ifeq ($(ARCH_PREBUILT),aarch64_generic)
+  PKG_HASH:=6f5a57edec4439725df011909319002748f2b2cfbf5a0386c42a97eb2cdf864f
+else ifeq ($(ARCH_PREBUILT),arm_arm1176jzf-s_vfp)
+  PKG_HASH:=1611f9d1259089364ccc541a080b223d3de5d198a85dabee65bd03762b535bcf
+else ifeq ($(ARCH_PREBUILT),arm_arm926ej-s)
+  PKG_HASH:=6b4d03bd232a13a0720dfba077bd1847617a1fb699bcf20ffee182c49643ccfb
+else ifeq ($(ARCH_PREBUILT),arm_cortex-a15_neon-vfpv4)
+  PKG_HASH:=036af44c9bd818a369cd0b391995d802bb01b46fb868fb7b487b8aceb57355fc
+else ifeq ($(ARCH_PREBUILT),arm_cortex-a5_vfpv4)
+  PKG_HASH:=bdae0724f844da0224a94318193238f59e9766c86b05d6dd7bbdcd3b14773fa5
+else ifeq ($(ARCH_PREBUILT),arm_cortex-a7)
+  PKG_HASH:=c6ca6644df5d57b241a212bea3d11427bb369a67d58d3352e7aa488ef56f34e2
+else ifeq ($(ARCH_PREBUILT),arm_cortex-a7_neon-vfpv4)
+  PKG_HASH:=ded055c58d29849532975d203e03f0347c41b88047cd0651638a0555acbaa1a3
+else ifeq ($(ARCH_PREBUILT),arm_cortex-a7_vfpv4)
+  PKG_HASH:=694d438987957c1b0794ad25f3d5e1411f8ab2edf4d6f7510e13f238fd36f64f
+else ifeq ($(ARCH_PREBUILT),arm_cortex-a8_vfpv3)
+  PKG_HASH:=b812efc3eda1841acee9cd83c2ae049a8b1981437f4eed33f6947aca85aa07b8
+else ifeq ($(ARCH_PREBUILT),arm_cortex-a9)
+  PKG_HASH:=cd40f3b7b5c20be420e2b5240ffe1ef84a058fe06aebcd674ce421e4e23db549
+else ifeq ($(ARCH_PREBUILT),arm_cortex-a9_neon)
+  PKG_HASH:=e5df785a494642d866c27e35daa455b460302c2d84be66d86dd55d285bfad2c0
+else ifeq ($(ARCH_PREBUILT),arm_cortex-a9_vfpv3-d16)
+  PKG_HASH:=15337f6942e3122b83a3764e9c23ee03f1ebd54cfc5205ba6677c0cf3af97ded
+else ifeq ($(ARCH_PREBUILT),arm_mpcore)
+  PKG_HASH:=2c2be2c624b0ba6462f71e14e592ec3abc77b4387a3c5786587372ff735d4fef
+else ifeq ($(ARCH_PREBUILT),arm_xscale)
+  PKG_HASH:=b03855162f516600704898545269a99bf52b4abeb2da7d12d412186f8830704f
+else ifeq ($(ARCH_PREBUILT),mipsel_24kc)
+  PKG_HASH:=2ac11b97037a5b5628bf8b858ee59db53f79ab15fc589533a0b1a61f68876fcf
+else ifeq ($(ARCH_PREBUILT),mipsel_mips32)
+  PKG_HASH:=98963a397406082cd2b236f701b7e696b0814677485eccbf60332d47ed54cc28
+else ifeq ($(ARCH_PREBUILT),riscv64)
+  PKG_HASH:=ca347b75ba47a80105fb915f1b85b4f1654a05a6b437244715ee6bd4310bf771
+else ifeq ($(ARCH_PREBUILT),x86)
+  PKG_HASH:=6594a79adae775045168ca4609a9bde9204f46af76b56a20f4bf524c65824ac4
+else ifeq ($(ARCH_PREBUILT),x86_64)
+  PKG_HASH:=3281ee8957956ec5a5028bd34f1f8053609daf7043ce846462595a1f0d89147e
+else
+  PKG_HASH:=dummy
+endif
 
 PKG_LICENSE:=BSD 3-Clause
 PKG_LICENSE_FILES:=LICENSE
-PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
+PKG_MAINTAINER:=sbwml <admin@cooluc.com>
 
-PKG_BUILD_DEPENDS:=gn/host
-PKG_BUILD_PARALLEL:=1
-PKG_BUILD_FLAGS:=no-mips16
-
-ifeq ($(strip $(NINJA)),)
-ifneq ($(wildcard $(TOPDIR)/feeds/packages/devel/ninja/ninja.mk),)
-PKG_BUILD_DEPENDS+=ninja/host
-NINJA = \
-	MAKEFLAGS="$(MAKE_JOBSERVER)" \
-	$(STAGING_DIR_HOSTPKG)/bin/ninja \
-		$(if $(findstring c,$(OPENWRT_VERBOSE)),-v) \
-		$(if $(MAKE_JOBSERVER),,-j1)
-endif
-endif
-
-ifneq ($(CONFIG_CPU_TYPE)," ")
-  CPU_TYPE:=$(word 1, $(subst +," ,$(CONFIG_CPU_TYPE)))
-  CPU_SUBTYPE:=$(word 2, $(subst +, ",$(CONFIG_CPU_TYPE)))
-  ifeq ($(CPU_SUBTYPE),)
-    CPU_SUBTYPE:=""
-  endif
-else
-  CPU_TYPE:=""
-  CPU_SUBTYPE:=""
-endif
+PKG_BUILD_DIR:=$(BUILD_DIR)/naiveproxy-v$(PKG_VERSION)-openwrt-$(ARCH_PACKAGES)
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -50,7 +80,7 @@ define Package/naiveproxy
   SUBMENU:=Web Servers/Proxies
   TITLE:=Make a fortune quietly
   URL:=https://github.com/klzgrad/naiveproxy
-  DEPENDS:=@!(arc||armeb||mips||mips64||powerpc||TARGET_gemini) +libatomic
+  DEPENDS:=@(aarch64||arm||i386||mipsel||riscv64||x86_64) +libatomic
 endef
 
 define Package/naiveproxy/description
@@ -59,66 +89,23 @@ define Package/naiveproxy/description
   ensures best practices in performance and security.
 endef
 
-ifneq ($(CONFIG_CCACHE),)
-  export CCACHE_SLOPPINESS=time_macros
-  export CCACHE_BASEDIR=$(PKG_BUILD_DIR)/src
-  export CCACHE_CPP2=yes
-  export naive_ccache_flags=cc_wrapper="$(CCACHE)"
-endif
-
-CLANG_VER:=19-init-8091-gab037c4f-1
-CLANG_FILE:=clang-llvmorg-$(CLANG_VER).tgz
-define Download/CLANG
-	URL:=https://commondatastorage.googleapis.com/chromium-browser-clang/Linux_x64
-	URL_FILE:=$(CLANG_FILE)
-	FILE:=$(CLANG_FILE)
-	HASH:=6b797d118cc593eca0f2e568169295a5a9b65ddabed2de34b9a201a4bb7990f5
-endef
-
-PGO_VER:=6422-1715102072-9bdbfa29f2bb1ff28f0f031b98501a1193b8d03b-13cfbf145656b369f9c23bff70ab2fb07e1e2fdb
-PGO_FILE:=chrome-linux-$(PGO_VER).profdata
-define Download/PGO_PROF
-	URL:=https://storage.googleapis.com/chromium-optimization-profiles/pgo_profiles
-	URL_FILE:=$(PGO_FILE)
-	FILE:=$(PGO_FILE)
-	HASH:=5a0b3d3f75c536cade97f15a71c17424c868948fa26a8267488bd588756b66af
+define Package/naiveproxy/conffiles
+/etc/config/naiveproxy
 endef
 
 define Build/Prepare
-	$(call Build/Prepare/Default)
-
-	( \
-		pushd $(PKG_BUILD_DIR)/src ; \
-		mkdir -p "chrome/build/pgo_profiles" ; \
-		$(CP) "$(DL_DIR)/$(PGO_FILE)" "chrome/build/pgo_profiles" ; \
-		mkdir -p "third_party/llvm-build/Release+Asserts" ; \
-		$(TAR) -xzf "$(DL_DIR)/$(CLANG_FILE)" -C "third_party/llvm-build/Release+Asserts" ; \
-		echo -e "llvmorg-$(CLANG_VER)" > "third_party/llvm-build/Release+Asserts/cr_build_revision" ; \
-		popd ; \
-	)
-endef
-
-define Build/Configure
-	( \
-		pushd "$(PKG_BUILD_DIR)/src" ; \
-		. ../init_env.sh "$(ARCH)" $(CPU_TYPE) $(CPU_SUBTYPE) "$(TOOLCHAIN_DIR)" ; \
-		export naive_flags+=" $$$${naive_ccache_flags}" ; \
-		mkdir -p "out" ; \
-		gn gen "out/Release" --args="$$$${naive_flags}" --script-executable="$(PYTHON)" ; \
-		popd ; \
-	)
+	$(TAR) --strip-components=1 -C $(PKG_BUILD_DIR) -xJf $(DL_DIR)/naiveproxy-v$(PKG_VERSION)-openwrt-$(ARCH_PREBUILT).tar.xz
 endef
 
 define Build/Compile
-	+$(NINJA) -C "$(PKG_BUILD_DIR)/src/out/Release" naive
 endef
 
 define Package/naiveproxy/install
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/src/out/Release/naive $(1)/usr/bin/naive
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/naive $(1)/usr/bin/naive
+	$(INSTALL_DIR) $(1)/etc/config $(1)/etc/init.d
+	$(INSTALL_CONF) $(CURDIR)/files/naiveproxy.config $(1)/etc/config/naiveproxy
+	$(INSTALL_BIN) $(CURDIR)/files/naiveproxy.init $(1)/etc/init.d/naiveproxy
 endef
-
-$(eval $(call Download,CLANG))
-$(eval $(call Download,PGO_PROF))
 
 $(eval $(call BuildPackage,naiveproxy))
