@@ -267,6 +267,8 @@ jobs:
             compare_versions "$Old_PKG_VERSION" "$New_PKG_VERSION"
             result=$?
 
+            echo "$result"
+
             if [[ $result -eq 0 ]]; then
               echo "status=failure" >> $GITHUB_OUTPUT
               echo "${{ matrix.pakcages }}版本为最新版本$New_PKG_VERSION, 无需更新"
