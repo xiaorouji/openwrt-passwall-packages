@@ -249,16 +249,22 @@ jobs:
             New_PKG_VERSION=$(${{ matrix.release_api_command }})
             echo "${{ matrix.pakcages }}目前版本: $Old_PKG_VERSION"
             echo "${{ matrix.pakcages }}最新版本: $New_PKG_VERSION"
-            if [ "$Old_PKG_VERSION" = "$New_PKG_VERSION" ]; then 
-              echo "status=failure" >> $GITHUB_OUTPUT; 
-              echo "${{ matrix.pakcages }}版本为最新版本$New_PKG_VERSION,无需更新"; 
-            else 
-              echo "New_PKG_VERSION=$New_PKG_VERSION" >> $GITHUB_OUTPUT;  
-              echo "status=success" >> $GITHUB_OUTPUT;
+            if [ "$(printf '%s\n' "$Old_PKG_VERSION" "$New_PKG_VERSION" | sort -V | head -n1)" != "$Old_PKG_VERSION" ]; then
+              if [ "$Old_PKG_VERSION" = "$New_PKG_VERSION" ]; then 
+                echo "status=failure" >> $GITHUB_OUTPUT; 
+                echo "${{ matrix.pakcages }}版本为最新版本$New_PKG_VERSION,无需更新"; 
+              else 
+                echo "New_PKG_VERSION=$New_PKG_VERSION" >> $GITHUB_OUTPUT;  
+                echo "status=success" >> $GITHUB_OUTPUT;
+              fi
+            else
+              echo "status=failure" >> $GITHUB_OUTPUT;
+              echo "检测到当前版本不低于最新latest release版本，不执行更新";
             fi
           else
             echo "status=failure" >> $GITHUB_OUTPUT;
           fi
+
 
 
       - name: Update ${{ matrix.pakcages }}
