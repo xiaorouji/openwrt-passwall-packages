@@ -263,7 +263,7 @@ jobs:
               result=2
             fi
 
-            echo "$result"
+            echo "版本对比结果：$result "
 
             if [[ $result -eq 0 ]]; then
               echo "status=failure" >> $GITHUB_OUTPUT
