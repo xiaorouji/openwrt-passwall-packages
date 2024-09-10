@@ -252,12 +252,12 @@ jobs:
 
 
             compare_versions() {
-              ver1=$1
-              ver2=$2
+              ver1=$(echo "$1" | sed 's/[^0-9]//g')
+              ver2=$(echo "$2" | sed 's/[^0-9]//g')
 
               if [[ "$ver1" == "$ver2" ]]; then
                 return 0  # 相同版本
-              elif [[ "$(printf '%s\n' "$ver1" "$ver2" | sort -V | head -n1)" == "$ver1" ]]; then
+              elif [[ "$ver1" -lt "$ver2" ]]; then
                 return 1  # ver1 小于 ver2
               else
                 return 2  # ver1 大于 ver2
