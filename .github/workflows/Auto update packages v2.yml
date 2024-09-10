@@ -248,21 +248,37 @@ jobs:
             fi
             New_PKG_VERSION=$(${{ matrix.release_api_command }})
             echo "${{ matrix.pakcages }}目前版本: $Old_PKG_VERSION"
-            echo "${{ matrix.pakcages }}最新版本: $New_PKG_VERSION"
-            if [ "$(printf '%s\n' "$Old_PKG_VERSION" "$New_PKG_VERSION" | sort -V | head -n1)" != "$Old_PKG_VERSION" ]; then
-              if [ "$Old_PKG_VERSION" = "$New_PKG_VERSION" ]; then 
-                echo "status=failure" >> $GITHUB_OUTPUT; 
-                echo "${{ matrix.pakcages }}版本为最新版本$New_PKG_VERSION,无需更新"; 
-              else 
-                echo "New_PKG_VERSION=$New_PKG_VERSION" >> $GITHUB_OUTPUT;  
-                echo "status=success" >> $GITHUB_OUTPUT;
+            echo "${{ matrix.pakcages }}latest release版本: $New_PKG_VERSION"
+
+
+            compare_versions() {
+              ver1=$1
+              ver2=$2
+
+              if [[ "$ver1" == "$ver2" ]]; then
+                return 0  # 相同版本
+              elif [[ "$(printf '%s\n' "$ver1" "$ver2" | sort -V | head -n1)" == "$ver1" ]]; then
+                return 1  # ver1 小于 ver2
+              else
+                return 2  # ver1 大于 ver2
               fi
+            }
+
+            compare_versions "$Old_PKG_VERSION" "$New_PKG_VERSION"
+            result=$?
+
+            if [[ $result -eq 0 ]]; then
+              echo "status=failure" >> $GITHUB_OUTPUT
+              echo "${{ matrix.pakcages }}版本为最新版本$New_PKG_VERSION, 无需更新"
+            elif [[ $result -eq 1 ]]; then
+              echo "New_PKG_VERSION=$New_PKG_VERSION" >> $GITHUB_OUTPUT
+              echo "status=success" >> $GITHUB_OUTPUT
             else
-              echo "status=failure" >> $GITHUB_OUTPUT;
-              echo "检测到当前版本不低于最新latest release版本，不执行更新";
+              echo "status=failure" >> $GITHUB_OUTPUT
+              echo "检测到本地版本高于最新latest release版本，停止更新"
             fi
           else
-            echo "status=failure" >> $GITHUB_OUTPUT;
+            echo "status=failure" >> $GITHUB_OUTPUT
           fi
 
 
