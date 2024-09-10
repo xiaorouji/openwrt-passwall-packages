@@ -250,22 +250,18 @@ jobs:
             echo "${{ matrix.pakcages }}目前版本: $Old_PKG_VERSION"
             echo "${{ matrix.pakcages }}latest release版本: $New_PKG_VERSION"
 
+            result=0
 
-            compare_versions() {
-              ver1=$(echo "$1" | sed 's/[^0-9]//g')
-              ver2=$(echo "$2" | sed 's/[^0-9]//g')
+            ver1=$(echo "$Old_PKG_VERSION" | sed 's/[^0-9]//g')
+            ver2=$(echo "$New_PKG_VERSION" | sed 's/[^0-9]//g')
 
-              if [[ "$ver1" == "$ver2" ]]; then
-                return 0  # 相同版本
-              elif [[ "$ver1" -lt "$ver2" ]]; then
-                return 1  # ver1 小于 ver2
-              else
-                return 2  # ver1 大于 ver2
-              fi
-            }
-
-            compare_versions "$Old_PKG_VERSION" "$New_PKG_VERSION"
-            result=$?
+            if [[ "$ver1" == "$ver2" ]]; then
+              result=0
+            elif [[ "$ver1" -lt "$ver2" ]]; then
+              result=1
+            else
+              result=2
+            fi
 
             echo "$result"
 
