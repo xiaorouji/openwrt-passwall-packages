@@ -15,7 +15,13 @@ on:
       is_update_geodata:
         description: 'is update geodata'
         required: false
+        default: 'false'
+
+      is_update_from_prerelease:
+        description: 'is update from prerelease'
+        required: false
         default: 'false'  
+        
   schedule:
     - cron: "0 */4 * * *"
 env:
@@ -64,6 +70,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/txthinking/brook/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/txthinking/brook/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/txthinking/brook/tar.gz/v
             file_name:
 
@@ -84,6 +91,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/apernet/hysteria/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/apernet/hysteria/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/apernet/hysteria/tar.gz/app/v
             file_name:
 
@@ -94,6 +102,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/zfl9/ipt2socks/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/zfl9/ipt2socks/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/zfl9/ipt2socks/tar.gz/v
             file_name:
 
@@ -104,6 +113,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/rofl0r/microsocks/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/rofl0r/microsocks/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/rofl0r/microsocks/tar.gz/v
             file_name:
 
@@ -114,6 +124,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/shadowsocks/shadowsocks-rust/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/shadowsocks/shadowsocks-rust/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/shadowsocks/shadowsocks-rust/tar.gz/v
             file_name:
             
@@ -124,6 +135,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/SagerNet/sing-box/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/SagerNet/sing-box/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/SagerNet/sing-box/tar.gz/v
             file_name:
 
@@ -134,6 +146,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/trojan-gfw/trojan/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/trojan-gfw/trojan/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/trojan-gfw/trojan/tar.gz/v
             file_name:
 
@@ -144,6 +157,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/p4gefau1t/trojan-go/tar.gz/v
             file_name:
 
@@ -154,6 +168,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/v2fly/v2ray-core/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/v2fly/v2ray-core/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/v2fly/v2ray-core/tar.gz/v
             file_name:
 
@@ -164,6 +179,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/teddysun/v2ray-plugin/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/teddysun/v2ray-plugin/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/teddysun/v2ray-plugin/tar.gz/v
             file_name:
 
@@ -174,6 +190,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/XTLS/Xray-core/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/XTLS/Xray-core/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/XTLS/Xray-core/tar.gz/v
             file_name:
 
@@ -184,6 +201,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/teddysun/xray-plugin/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/teddysun/xray-plugin/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/teddysun/xray-plugin/tar.gz/v
             file_name: 
 
@@ -194,6 +212,7 @@ jobs:
             version_line:
             hash_line: 21
             release_api_command: curl -sL "https://api.github.com/repos/v2fly/geoip/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/v2fly/geoip/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://github.com/v2fly/geoip/releases/download/
             file_name: /geoip.dat
 
@@ -204,6 +223,7 @@ jobs:
             version_line:
             hash_line: 30
             release_api_command: curl -sL "https://api.github.com/repos/v2fly/domain-list-community/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/v2fly/domain-list-community/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://github.com/v2fly/domain-list-community/releases/download/
             file_name: /dlc.dat
 
@@ -214,6 +234,7 @@ jobs:
             version_line:
             hash_line:
             release_api_command: curl -sL "https://api.github.com/repos/zfl9/dns2tcp/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/zfl9/dns2tcp/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
             release_download_url: https://codeload.github.com/zfl9/dns2tcp/tar.gz/v
             file_name:
 
@@ -246,7 +267,11 @@ jobs:
             else
               Old_PKG_VERSION=$(sed -n '${{ matrix.version_line }}p' Makefile | awk -F '=' '{print $2}');
             fi
-            New_PKG_VERSION=$(${{ matrix.release_api_command }})
+            if [ "${{ github.event.inputs.is_update_from_prerelease }}" = "true" ]; then
+              New_PKG_VERSION=$(${{ matrix.prerelease_api_command }})
+            else
+              New_PKG_VERSION=$(${{ matrix.release_api_command }})
+            fi
             echo "${{ matrix.pakcages }}目前版本: $Old_PKG_VERSION"
             echo "${{ matrix.pakcages }}latest release版本: $New_PKG_VERSION"
 
