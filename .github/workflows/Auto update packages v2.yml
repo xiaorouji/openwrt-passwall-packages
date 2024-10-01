@@ -342,7 +342,7 @@ jobs:
       - name: Create Pull Request
         id: cpr
         if: steps.check.outputs.status == 'success' && steps.check.outputs.New_PKG_VERSION != '' && steps.update.outputs.branch_exists == '' && !cancelled()
-        uses: peter-evans/create-pull-request@v5.0.2
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "${{ matrix.pakcages }}: update to ${{ steps.update.outputs.version }}"
