@@ -13,13 +13,20 @@ ifeq ($(ARCH),aarch64)
     PKG_HASH:=914e8b66805b1804f6688dfcda3b67c7c45e5fc5e05afff4837450f8b67a8372
   endif
 else ifeq ($(ARCH),arm)
-  ARM_CPU_FEATURES:=$(word 2,$(subst +,$(space),$(call qstrip,$(CONFIG_CPU_TYPE))))
-  ifeq ($(ARM_CPU_FEATURES),)
+  ifeq ($(CONFIG_arm_v6),y)
     PKG_ARCH:=chinadns-ng+wolfssl@arm-linux-musleabi@generic+v6+soft_float@fast+lto
     PKG_HASH:=4881e4dc20a1a4b21bc0cc3c378da8d8004274929e5900d5246aece230eea4f8
+  else ifeq ($(CONFIG_arm_v7),y)
+    ifeq ($(CONFIG_HAS_FPU),y)
+      PKG_ARCH:=chinadns-ng+wolfssl@arm-linux-musleabihf@generic+v7a@fast+lto
+      PKG_HASH:=5a47e56ef6fac90d22eabc766ffb817cb15fa3875b03ea2a4cd8a684b25b401a
+    else
+      PKG_ARCH:=chinadns-ng+wolfssl@arm-linux-musleabi@generic+v6+soft_float@fast+lto
+      PKG_HASH:=4881e4dc20a1a4b21bc0cc3c378da8d8004274929e5900d5246aece230eea4f8
+    endif
   else
-    PKG_ARCH:=chinadns-ng+wolfssl@arm-linux-musleabihf@generic+v7a@fast+lto
-    PKG_HASH:=5a47e56ef6fac90d22eabc766ffb817cb15fa3875b03ea2a4cd8a684b25b401a
+    PKG_ARCH:=chinadns-ng+wolfssl@arm-linux-musleabi@generic+v5te+soft_float@fast+lto
+    PKG_HASH:=37d186ebaa24e2728ac23753bf0e0c5bfe77bfb044bf7d43fc46c02b429a4c0e
   endif
 else ifeq ($(ARCH),mips)
   PKG_ARCH:=chinadns-ng+wolfssl@mips-linux-musl@mips32+soft_float@fast+lto
