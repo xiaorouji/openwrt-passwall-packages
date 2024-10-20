@@ -38,6 +38,7 @@ define Package/$(PKG_NAME)
     +ca-bundle \
     +kmod-inet-diag \
     +kmod-netlink-diag \
+    +kmod-nft-nat6 \
     +kmod-tun
 endef
 
