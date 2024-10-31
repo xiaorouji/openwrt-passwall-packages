@@ -13,6 +13,10 @@ else ifeq ($(ARCH_PREBUILT),i386_pentium-mmx)
   ARCH_PREBUILT:=x86
 else ifeq ($(ARCH_PREBUILT),i386_pentium4)
   ARCH_PREBUILT:=x86
+else ifeq ($(ARCH_PREBUILT),mipsel_24kc_24kf)
+  ARCH_PREBUILT:=mipsel_24kc
+else ifeq ($(ARCH_PREBUILT),mipsel_74kc)
+  ARCH_PREBUILT:=mipsel_24kc
 else ifeq ($(ARCH_PREBUILT),riscv64_riscv64)
   ARCH_PREBUILT:=riscv64
 endif
