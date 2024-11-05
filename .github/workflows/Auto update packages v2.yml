@@ -277,18 +277,19 @@ jobs:
 
             result=0
 
-            ver1=$(echo "$Old_PKG_VERSION" | sed 's/[^0-9]//g')
-            ver2=$(echo "$New_PKG_VERSION" | sed 's/[^0-9]//g')
+            ver1="$Old_PKG_VERSION"
+            ver2="$New_PKG_VERSION"
 
-            if [[ "$ver1" == "$ver2" ]]; then
-              result=0
-            elif [[ "$ver1" -lt "$ver2" ]]; then
+            # 使用 sort -V 进行版本号比较
+            if [[ "$(printf "%s\n%s" "$ver1" "$ver2" | sort -V | head -n 1)" == "$ver1" && "$ver1" != "$ver2" ]]; then
               result=1
+            elif [[ "$ver1" == "$ver2" ]]; then
+              result=0
             else
               result=2
             fi
 
-            echo "版本对比结果：$result "
+            echo "版本对比结果：$result"
 
             if [[ $result -eq 0 ]]; then
               echo "status=failure" >> $GITHUB_OUTPUT
