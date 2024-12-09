@@ -32,7 +32,7 @@ define geoview/templates
     SECTION:=net
     CATEGORY:=Network
     SUBMENU:=Web Servers/Proxies
-    DEPENDS:=+$(GO_ARCH_DEPENDS)
+    DEPENDS+= $$(GO_ARCH_DEPENDS)
   endef
 
   define Package/$(1)/description
