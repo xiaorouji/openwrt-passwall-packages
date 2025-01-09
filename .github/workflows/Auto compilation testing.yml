@@ -145,6 +145,9 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a -f -p passwall_packages
 
+        rm -rf feeds/packages/lang/golang
+        git clone https://github.com/sbwml/packages_lang_golang -b 23.x feeds/packages/lang/golang
+
         echo "CONFIG_ALL_NONSHARED=n" > .config
         echo "CONFIG_ALL_KMODS=n" >> .config
         echo "CONFIG_ALL=n" >> .config
