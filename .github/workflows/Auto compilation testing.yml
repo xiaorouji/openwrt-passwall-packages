@@ -173,7 +173,7 @@ jobs:
         for DIR in "${DIRS[@]}"; do
           if [ -d "package/feeds/passwall_packages/$DIR" ]; then
             echo "Compiling changes in directory: $DIR"
-            make package/feeds/passwall_packages/$DIR/compile -j$(nproc) || exit 1
+            make package/feeds/passwall_packages/$DIR/compile -j$(nproc) V=s || exit 1
           else
             echo "Directory $DIR does not exist"
             exit 1
