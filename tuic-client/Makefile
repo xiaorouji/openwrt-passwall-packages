@@ -54,7 +54,7 @@ define Package/tuic-client
 	SUBMENU:=Web Servers/Proxies
 	TITLE:=Delicately-TUICed 0-RTT proxy protocol
 	URL:=https://github.com/EAimTY/tuic/
-	DEPENDS:=@USE_MUSL @(aarch64||arm||i386||x86_64) @!(TARGET_x86_geode||TARGET_x86_legacy)
+	DEPENDS:=@USE_MUSL @(aarch64||arm_v7||i386||x86_64) @!(TARGET_x86_geode||TARGET_x86_legacy)
 endef
 
 define Build/Prepare
