@@ -62,7 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        pakcages: [hysteria, ipt2socks, microsocks, shadowsocks-rust, sing-box, trojan, v2ray-core, v2ray-plugin, xray-core, xray-plugin, v2ray-geoip, v2ray-geosite, dns2tcp]
+        pakcages: [hysteria, ipt2socks, microsocks, shadowsocks-rust, sing-box, v2ray-core, v2ray-plugin, xray-core, xray-plugin, v2ray-geoip, v2ray-geosite]
         include:
           # - pakcages: brook
           #   folder: brook
@@ -140,16 +140,16 @@ jobs:
             release_download_url: https://codeload.github.com/SagerNet/sing-box/tar.gz/v
             file_name:
 
-          - pakcages: trojan
-            folder: trojan
-            version_head: PKG_VERSION:=
-            hash_head: PKG_HASH:=
-            version_line:
-            hash_line:
-            release_api_command: curl -sL "https://api.github.com/repos/trojan-gfw/trojan/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
-            prerelease_api_command: curl -sL "https://api.github.com/repos/trojan-gfw/trojan/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
-            release_download_url: https://codeload.github.com/trojan-gfw/trojan/tar.gz/v
-            file_name:
+          # - pakcages: trojan
+          #   folder: trojan
+          #   version_head: PKG_VERSION:=
+          #   hash_head: PKG_HASH:=
+          #   version_line:
+          #   hash_line:
+          #   release_api_command: curl -sL "https://api.github.com/repos/trojan-gfw/trojan/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+          #   prerelease_api_command: curl -sL "https://api.github.com/repos/trojan-gfw/trojan/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
+          #   release_download_url: https://codeload.github.com/trojan-gfw/trojan/tar.gz/v
+          #   file_name:
 
           # - pakcages: trojan-go
           #   folder: trojan-go
