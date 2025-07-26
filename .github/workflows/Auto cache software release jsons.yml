@@ -1,0 +1,66 @@
+#
+# Copyright (c) 2025-2026 LWB1978 <https://github.com/lwb1978>
+# Description: Auto Cache Software Release JSONs
+#
+name: Auto Cache Software Release JSONs
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  cache_json:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialization environment
+        run: |
+          sudo timedatectl set-timezone "$TZ"
+
+      - name: Fetch GitHub release JSONs
+        run: |
+          mkdir -p output
+          declare -A repos
+          repos["geoview"]="snowie2000/geoview"
+          repos["chinadns-ng"]="zfl9/chinadns-ng"
+          repos["xray"]="XTLS/Xray-core"
+          repos["sing-box"]="SagerNet/sing-box"
+          repos["hysteria"]="HyNetwork/hysteria"
+
+          for name in "${!repos[@]}"; do
+            repo="${repos[$name]}"
+            echo "Fetching release JSONs for $name from $repo ..."
+            curl -sL "https://api.github.com/repos/$repo/releases/latest" -o "output/${name}-release-api.json"
+            curl -sL "https://api.github.com/repos/$repo/releases?per_page=1" -o "output/${name}-pre-release-api.json"
+          done
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: api-cache
+          name: Software Release API Cache
+          files: output/*.json
+          body: |
+            This release contains cached GitHub Release API JSON data for several software projects.  
+            It is used by the PassWall (and PassWall2) update component to reduce reliance on GitHub's rate-limited API (60 requests per IP per hour).  
+            
+            Generated automatically by GitHub Actions.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 6
+          delete_workflow_pattern: 'Auto Cache Software Release JSONs'
