@@ -212,9 +212,9 @@ jobs:
             hash_head: \  HASH:=
             version_line:
             hash_line: 21
-            release_api_command: curl -sL "https://api.github.com/repos/v2fly/geoip/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
-            prerelease_api_command: curl -sL "https://api.github.com/repos/v2fly/geoip/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
-            release_download_url: https://github.com/v2fly/geoip/releases/download/
+            release_api_command: curl -sL "https://api.github.com/repos/Loyalsoldier/geoip/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/Loyalsoldier/geoip/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
+            release_download_url: https://github.com/Loyalsoldier/geoip/releases/download/
             file_name: /geoip.dat
 
           - pakcages: v2ray-geosite
@@ -223,10 +223,10 @@ jobs:
             hash_head: \  HASH:=
             version_line:
             hash_line: 30
-            release_api_command: curl -sL "https://api.github.com/repos/v2fly/domain-list-community/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
-            prerelease_api_command: curl -sL "https://api.github.com/repos/v2fly/domain-list-community/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
-            release_download_url: https://github.com/v2fly/domain-list-community/releases/download/
-            file_name: /dlc.dat
+            release_api_command: curl -sL "https://api.github.com/repos/Loyalsoldier/v2ray-rules-dat/releases" | jq -r 'map(select(.prerelease|not)) | first | .tag_name' | sed -e 's/.*v//'
+            prerelease_api_command: curl -sL "https://api.github.com/repos/Loyalsoldier/v2ray-rules-dat/releases" | jq -r 'first | .tag_name' | sed -e 's/.*v//'
+            release_download_url: https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/
+            file_name: /geosite.dat
 
           # - pakcages: dns2tcp
           #   folder: dns2tcp
