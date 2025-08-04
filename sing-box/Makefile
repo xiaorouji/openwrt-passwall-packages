@@ -82,10 +82,6 @@ define Package/$(PKG_NAME)/config
         Required by HTTP3 DNS transports, Naive inbound,
         Hysteria inbound / outbound, and v2ray QUIC transport.
 
-    config SING_BOX_WITH_REALITY_SERVER
-      bool "Build with reality TLS server support"
-      default n
-
     config SING_BOX_WITH_UTLS
       bool "Build with uTLS support"
       default y
@@ -108,7 +104,6 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_SING_BOX_WITH_GRPC \
 	CONFIG_SING_BOX_WITH_GVISOR \
 	CONFIG_SING_BOX_WITH_QUIC \
-	CONFIG_SING_BOX_WITH_REALITY_SERVER \
 	CONFIG_SING_BOX_WITH_UTLS \
 	CONFIG_SING_BOX_WITH_V2RAY_API \
 	CONFIG_SING_BOX_WITH_WIREGUARD
@@ -120,7 +115,6 @@ GO_PKG_TAGS:=$(subst $(space),$(comma),$(strip \
 	$(if $(CONFIG_SING_BOX_WITH_GRPC),with_grpc) \
 	$(if $(CONFIG_SING_BOX_WITH_GVISOR),with_gvisor) \
 	$(if $(CONFIG_SING_BOX_WITH_QUIC),with_quic) \
-	$(if $(CONFIG_SING_BOX_WITH_REALITY_SERVER),with_reality_server) \
 	$(if $(CONFIG_SING_BOX_WITH_UTLS),with_utls) \
 	$(if $(CONFIG_SING_BOX_WITH_V2RAY_API),with_v2ray_api) \
 	$(if $(CONFIG_SING_BOX_WITH_WIREGUARD),with_wireguard) \
