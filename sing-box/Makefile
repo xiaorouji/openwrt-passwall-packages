@@ -64,10 +64,6 @@ define Package/$(PKG_NAME)/config
       bool "Build with DHCP support"
       default y
 
-    config SING_BOX_WITH_ECH
-      bool "Build with TLS ECH extension support"
-      default y
-
     config SING_BOX_WITH_GRPC
       bool "Build with standard gRPC support"
       default n
@@ -109,7 +105,6 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_SING_BOX_WITH_ACME \
 	CONFIG_SING_BOX_WITH_CLASH_API \
 	CONFIG_SING_BOX_WITH_DHCP \
-	CONFIG_SING_BOX_WITH_ECH \
 	CONFIG_SING_BOX_WITH_GRPC \
 	CONFIG_SING_BOX_WITH_GVISOR \
 	CONFIG_SING_BOX_WITH_QUIC \
@@ -122,7 +117,6 @@ GO_PKG_TAGS:=$(subst $(space),$(comma),$(strip \
 	$(if $(CONFIG_SING_BOX_WITH_ACME),with_acme) \
 	$(if $(CONFIG_SING_BOX_WITH_CLASH_API),with_clash_api) \
 	$(if $(CONFIG_SING_BOX_WITH_DHCP),with_dhcp) \
-	$(if $(CONFIG_SING_BOX_WITH_ECH),with_ech) \
 	$(if $(CONFIG_SING_BOX_WITH_GRPC),with_grpc) \
 	$(if $(CONFIG_SING_BOX_WITH_GVISOR),with_gvisor) \
 	$(if $(CONFIG_SING_BOX_WITH_QUIC),with_quic) \
