@@ -6,7 +6,7 @@ name: Auto Cache Software Release JSONs
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 env:
@@ -22,6 +22,15 @@ jobs:
       - name: Initialization environment
         run: |
           sudo timedatectl set-timezone "$TZ"
+
+      - name: Install GitHub CLI
+        run: sudo apt-get update && sudo apt-get install -y gh
+
+      - name: Delete old release and tag
+        run: |
+          gh release delete api-cache --cleanup-tag -y || echo "No existing release to delete"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch GitHub release JSONs
         run: |
@@ -61,5 +70,5 @@ jobs:
           token: ${{ github.token }}
           repository: ${{ github.repository }}
           retain_days: 0
-          keep_minimum_runs: 6
+          keep_minimum_runs: 5
           delete_workflow_pattern: 'Auto Cache Software Release JSONs'
