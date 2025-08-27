@@ -1,0 +1,170 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -185,18 +185,33 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+ 
+ if (ANDROID)
+     set(ANDROID_MY_LIBS ${PROJECT_SOURCE_DIR}/trojan-plus-android-libs) 
++
++    set(BOOST_VERSION_HPP ${ANDROID_MY_LIBS}/include/boost/version.hpp)
++    if(EXISTS ${BOOST_VERSION_HPP})
++        file(STRINGS ${BOOST_VERSION_HPP} BOOST_VERSION_LINE REGEX "^#define BOOST_VERSION ")
++        string(REGEX REPLACE "^#define BOOST_VERSION ([0-9]+)$" "\\1" BOOST_VERSION ${BOOST_VERSION_LINE})
++    endif()
++
+     set(ANDROID_MY_LIBS_LIBRARIES 
+         ${ANDROID_MY_LIBS}/lib/${ANDROID_ABI}/libssl.a 
+         ${ANDROID_MY_LIBS}/lib/${ANDROID_ABI}/libcrypto.a
+-        ${ANDROID_MY_LIBS}/lib/${ANDROID_ABI}/libboost_system.a
+         ${ANDROID_MY_LIBS}/lib/${ANDROID_ABI}/libboost_program_options.a)
+ 
++    if(${BOOST_VERSION} VERSION_LESS 108900)
++        list(APPEND ANDROID_MY_LIBS_LIBRARIES ${ANDROID_MY_LIBS}/lib/${ANDROID_ABI}/libboost_system.a)
++    endif()
++
+     set(OPENSSL_VERSION 1.1.1)
+ 
+     include_directories(${ANDROID_MY_LIBS}/include)
+     target_link_libraries(trojan ${ANDROID_MY_LIBS_LIBRARIES})
+ else()
+-    find_package(Boost 1.66.0 REQUIRED COMPONENTS system program_options)
++    find_package(Boost 1.66.0 REQUIRED)
++    if(Boost_VERSION VERSION_LESS 108900)
++        find_package(Boost 1.66.0 REQUIRED COMPONENTS system program_options)
++    else()
++        find_package(Boost 1.66.0 REQUIRED COMPONENTS program_options)
++    endif()
+     include_directories(${Boost_INCLUDE_DIR})
+     target_link_libraries(trojan ${Boost_LIBRARIES})
+     if(MSVC)
+--- a/src/core/config.cpp
++++ b/src/core/config.cpp
+@@ -42,6 +42,9 @@
+ #include "session/session.h"
+ #include "ssl/ssldefaults.h"
+ #include "ssl/sslsession.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace std;
+ using namespace boost::property_tree;
+--- a/src/core/icmpd.cpp
++++ b/src/core/icmpd.cpp
+@@ -27,6 +27,9 @@
+ #include "core/service.h"
+ #include "core/utils.h"
+ #include "session/pipelinesession.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace trojan;
+ using namespace std;
+--- a/src/core/pipeline.cpp
++++ b/src/core/pipeline.cpp
+@@ -23,6 +23,9 @@
+ #include "core/utils.h"
+ #include "proto/pipelinerequest.h"
+ #include "session/clientsession.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace std;
+ using namespace boost::asio::ip;
+--- a/src/core/service.cpp
++++ b/src/core/service.cpp
+@@ -35,6 +35,9 @@
+ #include "session/pipelinesession.h"
+ #include "session/serversession.h"
+ #include "utils.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ 
+ using namespace std;
+--- a/src/core/utils.cpp
++++ b/src/core/utils.cpp
+@@ -32,6 +32,9 @@
+ #include "core/service.h"
+ #include "core/version.h"
+ #include "log.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace std;
+ using namespace boost::asio::ip;
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -33,6 +33,9 @@
+ 
+ #include "core/service.h"
+ #include "core/version.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace std;
+ using namespace boost::asio;
+--- a/src/session/clientsession.cpp
++++ b/src/session/clientsession.cpp
+@@ -27,6 +27,9 @@
+ #include "proto/trojanrequest.h"
+ #include "proto/udppacket.h"
+ #include "ssl/sslsession.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace std;
+ using namespace boost::asio::ip;
+--- a/src/session/pipelinesession.cpp
++++ b/src/session/pipelinesession.cpp
+@@ -29,6 +29,9 @@
+ #include "core/utils.h"
+ #include "proto/trojanrequest.h"
+ #include "serversession.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace std;
+ using namespace boost::asio::ip;
+--- a/src/session/serversession.cpp
++++ b/src/session/serversession.cpp
+@@ -26,6 +26,9 @@
+ #include "core/utils.h"
+ #include "proto/trojanrequest.h"
+ #include "proto/udppacket.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace std;
+ using namespace boost::asio::ip;
+--- a/src/session/session.cpp
++++ b/src/session/session.cpp
+@@ -22,6 +22,9 @@
+ 
+ #include "session.h"
+ #include "core/service.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace std;
+ 
+--- a/src/session/udpforwardsession.cpp
++++ b/src/session/udpforwardsession.cpp
+@@ -30,6 +30,9 @@
+ #include "proto/trojanrequest.h"
+ #include "proto/udppacket.h"
+ #include "ssl/sslsession.h"
++#if BOOST_VERSION >= 108900
++#include <boost/system.hpp>
++#endif
+ 
+ using namespace std;
+ using namespace boost::asio::ip;
