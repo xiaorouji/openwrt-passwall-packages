@@ -14,7 +14,7 @@ PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/peter-tank/trojan-plus.git
 PKG_SOURCE_DATE:=2020-09-06
 PKG_SOURCE_VERSION:=a6394cdd718669b0c7491493a78e61f6f0f899b3
-PKG_MIRROR_HASH:=adad9914b2c1cffa0f8c2b10610f7119f77090ae5259872af0b82d2547500100
+PKG_MIRROR_HASH:=0bc832390044668dc163e9fec3c6cf7ac3037dc30a706e94292d974446c43d97
 
 PKG_BUILD_PARALLEL:=1
 PKG_BUILD_DEPENDS:=openssl
@@ -58,7 +58,17 @@ define Package/trojan-plus
 	URL:=https://github.com/Trojan-Plus-Group/trojan-plus
 	DEPENDS:= \
 		+libpthread +libstdcpp +libopenssl \
-		+boost +boost-system +boost-program_options
+		+boost +boost-program_options \
+		+@TROJAN_PLUS_BOOST_SYSTEM:boost-system
+endef
+
+define Package/trojan-plus/config
+	config TROJAN_PLUS_BOOST_SYSTEM
+		bool "Include boost-system depends (required for Boost < 1.89.0)"
+		default y if PACKAGE_boost-system
+		help
+			Select this option if your Boost version is lower than 1.89.0.
+			For Boost versions 1.89.0 and above, the system library is integrated into the main boost library.
 endef
 
 define Package/trojan-plus/install
