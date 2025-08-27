@@ -23,6 +23,17 @@ PKG_LICENSE:=GPL-3.0
 PKG_LICENSE_FILE:=LICENSE
 PKG_MAINTAINER:=Trojan-Plus-Group
 
+BOOST_MAKEFILE:= $(TOPDIR)/feeds/packages/libs/boost/Makefile
+BOOST_VER := $(shell grep '^PKG_VERSION' $(BOOST_MAKEFILE) 2>/dev/null | sed -E 's/^PKG_VERSION[^0-9]*//')
+
+BOOST_VER_MAJOR := $(word 1,$(subst ., ,$(BOOST_VER)))
+BOOST_VER_MINOR := $(word 2,$(subst ., ,$(BOOST_VER)))
+BOOST_VER_PATCH := $(word 3,$(subst ., ,$(BOOST_VER)))
+
+BOOST_VERSION := $(shell echo $$(($(BOOST_VER_MAJOR)*100000 + $(BOOST_VER_MINOR)*100 + $(BOOST_VER_PATCH))))
+
+BOOST_SYSTEM := $(if $(shell [ $(BOOST_VERSION) -ge 108900 ] && echo y),y,n)
+
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/cmake.mk
 
@@ -59,16 +70,7 @@ define Package/trojan-plus
 	DEPENDS:= \
 		+libpthread +libstdcpp +libopenssl \
 		+boost +boost-program_options \
-		+@TROJAN_PLUS_BOOST_SYSTEM:boost-system
-endef
-
-define Package/trojan-plus/config
-	config TROJAN_PLUS_BOOST_SYSTEM
-		bool "Include boost-system depends (required for Boost < 1.89.0)"
-		default y if PACKAGE_boost-system
-		help
-			Select this option if your Boost version is lower than 1.89.0.
-			For Boost versions 1.89.0 and above, the system library is integrated into the main boost library.
+		$(if $(filter y,$(BOOST_SYSTEM)),,+boost-system)
 endef
 
 define Package/trojan-plus/install
