@@ -60,7 +60,7 @@ define Package/trojan-plus
 	DEPENDS:= \
 		+libpthread +libstdcpp +libopenssl \
 		+boost +boost-program_options \
-		$(if $(filter y,$(BOOST_SYSTEM)),,+boost-system)
+		$(if $(filter y,$(NEED_BOOST_SYSTEM)),,+boost-system)
 endef
 
 define Package/trojan-plus/install
