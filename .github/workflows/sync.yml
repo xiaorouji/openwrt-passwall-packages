@@ -1,4 +1,4 @@
-name: Force Sync Fork with Upstream
+name: Force Sync Fork with Upstream 
 
 on:
   schedule:
@@ -27,12 +27,15 @@ jobs:
           git checkout main
           git reset --hard upstream/main
 
+      - name: Remove upstream workflows
+        run: |
+          rm -rf .github/workflows/*
+      
       - name: Restore sync.yml
         run: |
           git checkout origin/main -- .github/workflows/sync.yml || echo "No sync.yml to restore"
           git add .github/workflows/sync.yml
           git commit -m "Restore sync.yml after sync" || echo "No changes to commit"
-          git push origin main --force
 
       - name: Push force to origin
         env:
