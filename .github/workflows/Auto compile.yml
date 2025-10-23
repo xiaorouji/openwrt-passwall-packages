@@ -183,7 +183,7 @@ jobs:
           IFS=',' read -ra DIRS <<< "$CHANGED_DIRS"
           for DIR in "${DIRS[@]}"; do
             echo "Compiling DIR: $DIR"
-            make package/$DIR/compile -j$(nproc) V=s || \
+            make package/$DIR/compile -j$(nproc) V=s
           done
         else
           mapfile -t SELECTED < <(grep -E '^CONFIG_PACKAGE_' .config | sed 's/^CONFIG_PACKAGE_//;s/=m$//;s/=y$//')
