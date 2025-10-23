@@ -176,12 +176,19 @@ jobs:
       run: |
         cd sdk
         EXCLUDES="dns2socks ip2socks microsocks shadow-tls shadowsocks-libev trojan-plus xray-plugin"
+        echo "Scanning for Makefiles under package/feeds/passwall_packages..."
+        find package/feeds/passwall_packages -type f -name Makefile
+
         mapfile -t PKG_DIRS < <(find package/feeds/passwall_packages -type f -name Makefile -print | sed 's#/Makefile##')
+        echo "Found ${#PKG_DIRS[@]} package dirs"
+
         for D in "${PKG_DIRS[@]}"; do
           MF="$D/Makefile"
+          echo "Processing $MF"
           [ -f "$MF" ] || continue
           PKG_NAME=$(awk -F '[:=]' '/^PKG_NAME[ \t]*[:=]/{print $2}' "$MF" | head -n1 | xargs)
           [ -z "$PKG_NAME" ] && PKG_NAME=$(basename "$D")
+          echo "Candidate PKG_NAME=$PKG_NAME"
           SKIP=0
           for E in $EXCLUDES; do
             if [ "$PKG_NAME" = "$E" ]; then SKIP=1; break; fi
@@ -195,6 +202,7 @@ jobs:
         done
         make defconfig
         COUNT=$(grep -c '^CONFIG_PACKAGE_' .config || true)
+        echo "Final package count: $COUNT"
         if [ "$COUNT" -eq 0 ]; then
           echo "❌ No packages selected in all-mode, aborting build."
           exit 1
