@@ -152,44 +152,53 @@ jobs:
       if: env.MODE == 'changed'
       run: |
         cd sdk
-        if [ -z "$CHANGED_DIRS" ]; then
-          echo "No changes detected; skipping selection."
-        else
+        if [ -n "$CHANGED_DIRS" ]; then
           IFS=',' read -ra DIRS <<< "$CHANGED_DIRS"
           for DIR in "${DIRS[@]}"; do
             MF="package/feeds/passwall_packages/$DIR/Makefile"
             if [ -f "$MF" ]; then
-              PKG_NAME=$(awk -F ':=' '/^PKG_NAME:=/{print $2}' "$MF" | head -n1)
+              PKG_NAME=$(awk -F '[:=]' '/^PKG_NAME[ \t]*[:=]/{print $2}' "$MF" | head -n1 | xargs)
               [ -z "$PKG_NAME" ] && PKG_NAME="$DIR"
               echo "CONFIG_PACKAGE_${PKG_NAME}=m" >> .config
-              echo "Selected package: $PKG_NAME"
-            else
-              echo "Warning: $DIR has no Makefile under passwall_packages"
+              echo "Selected (changed-mode): $PKG_NAME"
             fi
           done
         fi
         make defconfig
+        COUNT=$(grep -c '^CONFIG_PACKAGE_' .config || true)
+        if [ "$COUNT" -eq 0 ]; then
+          echo "❌ No changed packages detected, aborting build."
+          exit 1
+        fi
 
     - name: Select packages into .config (all mode with exclusions)
       if: env.MODE == 'all'
       run: |
         cd sdk
         EXCLUDES="dns2socks ip2socks microsocks shadow-tls shadowsocks-libev trojan-plus xray-plugin"
-        mapfile -t PKG_DIRS < <(find package/feeds/passwall_packages -maxdepth 2 -type f -name Makefile -print | sed 's#/Makefile##')
+        mapfile -t PKG_DIRS < <(find package/feeds/passwall_packages -type f -name Makefile -print | sed 's#/Makefile##')
         for D in "${PKG_DIRS[@]}"; do
           MF="$D/Makefile"
           [ -f "$MF" ] || continue
-          PKG_NAME=$(awk -F ':=' '/^PKG_NAME:=/{print $2}' "$MF" | head -n1)
+          PKG_NAME=$(awk -F '[:=]' '/^PKG_NAME[ \t]*[:=]/{print $2}' "$MF" | head -n1 | xargs)
           [ -z "$PKG_NAME" ] && PKG_NAME=$(basename "$D")
           SKIP=0
           for E in $EXCLUDES; do
             if [ "$PKG_NAME" = "$E" ]; then SKIP=1; break; fi
           done
-          [ $SKIP -eq 1 ] && { echo "Excluded: $PKG_NAME"; continue; }
+          if [ $SKIP -eq 1 ]; then
+            echo "Excluded: $PKG_NAME"
+            continue
+          fi
           echo "CONFIG_PACKAGE_${PKG_NAME}=m" >> .config
           echo "Selected (all-mode): $PKG_NAME"
         done
         make defconfig
+        COUNT=$(grep -c '^CONFIG_PACKAGE_' .config || true)
+        if [ "$COUNT" -eq 0 ]; then
+          echo "❌ No packages selected in all-mode, aborting build."
+          exit 1
+        fi
 
     - name: Build packages
       run: |
