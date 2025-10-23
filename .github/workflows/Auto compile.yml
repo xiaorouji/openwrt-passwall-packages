@@ -3,7 +3,7 @@ name: Auto compile
 on:
   push:
     branches:
-      - only-3-platform
+      - main
     paths-ignore:
       - '**.md'
       - '.github/**'
@@ -31,15 +31,15 @@ jobs:
       matrix:
         include:
           - platform: x86_64
-            url_sdk: https://downloads.openwrt.org/releases/24.10.0/targets/x86/64/openwrt-sdk-24.10.0-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst
+            url_sdk: https://downloads.openwrt.org/releases/24.10.3/targets/x86/64/openwrt-sdk-24.10.3-x86-64_gcc-13.3.0_musl.Linux-x86_64.tar.zst
             sdk_ver: "24.10"
 
           - platform: aarch64_cortex-a53
-            url_sdk: https://downloads.openwrt.org/releases/24.10.0/targets/mvebu/cortexa53/openwrt-sdk-24.10.0-mvebu-cortexa53_gcc-13.3.0_musl.Linux-x86_64.tar.zst
+            url_sdk: https://downloads.openwrt.org/releases/24.10.3/targets/qualcommax/ipq807x/openwrt-sdk-24.10.3-qualcommax-ipq807x_gcc-13.3.0_musl.Linux-x86_64.tar.zst
             sdk_ver: "24.10"
 
           - platform: arm_cortex-a7_neon-vfpv4
-            url_sdk: https://downloads.openwrt.org/releases/24.10.0/targets/sunxi/cortexa7/openwrt-sdk-24.10.0-sunxi-cortexa7_gcc-13.3.0_musl_eabi.Linux-x86_64.tar.zst
+            url_sdk: https://downloads.openwrt.org/releases/24.10.3/targets/ipq40xx/generic/openwrt-sdk-24.10.3-ipq40xx-generic_gcc-13.3.0_musl_eabi.Linux-x86_64.tar.zst
             sdk_ver: "24.10"
 
     steps:
@@ -86,12 +86,27 @@ jobs:
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
 
+    - name: Cache SDK tarball
+      uses: actions/cache@v4
+      with:
+        path: openwrt-sdk-${{ matrix.platform }}.tar.zst
+        key: ${{ runner.os }}-sdk-${{ matrix.platform }}-${{ matrix.sdk_ver }}
+
     - name: Download SDK
       run: |
-        wget ${{ matrix.url_sdk }}
-        file_name=$(echo ${{matrix.url_sdk}} | awk -F/ '{print $NF}')
+        file_name=openwrt-sdk-${{ matrix.platform }}.tar.zst
+        if [ ! -f "$file_name" ]; then
+          wget -O $file_name ${{ matrix.url_sdk }}
+        fi
         mkdir sdk && tar --zstd -x -f $file_name -C ./sdk --strip-components=1
 
+    - name: Cache OpenWrt downloads
+      uses: actions/cache@v4
+      with:
+        path: sdk/dl
+        key: ${{ runner.os }}-openwrt-dl-${{ matrix.platform }}-${{ matrix.sdk_ver }}
+        restore-keys: ${{ runner.os }}-openwrt-dl-${{ matrix.platform }}-
+          
     - name: SSH connection to Actions
       uses: mxschmitt/action-tmate@v3.13
       if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh != 'false') || contains(github.event.action, 'ssh')
