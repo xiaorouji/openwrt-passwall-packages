@@ -1,14 +1,9 @@
-#
-# Copyright (c) 2023-2024 SMALLPROGRAM <https://github.com/smallprogram>
-# Description: Automated compilation testing
-#
-
 name: Auto compilation testing
 
 on:
   push:
     branches:
-      - main
+      - only-3-platform
     paths-ignore:
       - '**.md'
       - '.github/**'
@@ -16,6 +11,13 @@ on:
     paths-ignore:
       - '**.md'
       - '.github/**'
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: "Enable SSH debug session"
+        required: false
+        default: "false"
+
 env:
   TZ: Asia/Shanghai
   packages: ${{ github.repository }}
@@ -44,39 +46,34 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@main
       with:
-        fetch-depth: 0 
+        fetch-depth: 0
 
     - name: Setup variables
       run: |
         if [ "${{ github.event_name }}" == "pull_request" ]; then
           echo "BASE_SHA=$(git merge-base refs/remotes/origin/${{ github.base_ref }} ${{ github.event.pull_request.head.sha }})" >> $GITHUB_ENV
           echo "HEAD_SHA=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
-          echo "is pull_request event!"
-          echo "BASE_SHA:$BASE_SHA"
-          echo "HEAD_SHA:$HEAD_SHA"
+          echo "MODE=changed" >> $GITHUB_ENV
         elif [ "${{ github.event_name }}" == "push" ]; then
-          # Use `github.event.before` as the base SHA for push events to capture all changes in the push
           echo "BASE_SHA=${{ github.event.before }}" >> $GITHUB_ENV
           echo "HEAD_SHA=${{ github.event.after }}" >> $GITHUB_ENV
-          echo "is push event!"
-          echo "BASE_SHA:$BASE_SHA"
-          echo "HEAD_SHA:$HEAD_SHA"
+          echo "MODE=changed" >> $GITHUB_ENV
+        else
+          echo "MODE=all" >> $GITHUB_ENV
         fi
 
-    - name: Detect Changed Directories
+    - name: Detect changed directories
+      if: env.MODE == 'changed'
       id: detect-changes
       run: |
-          echo "Base SHA: $BASE_SHA"
-          echo "Head SHA: $HEAD_SHA"
-          CHANGED_DIRS=$(git diff --name-only $BASE_SHA $HEAD_SHA | awk -F'/' '{print $1}' | sort -u | tr '\n' ',')
-          echo "Changed directories: $CHANGED_DIRS"
-          CHANGED_DIRS=${CHANGED_DIRS%,}
-          echo "CHANGED_DIRS=$CHANGED_DIRS" >> $GITHUB_ENV
+        CHANGED_DIRS=$(git diff --name-only $BASE_SHA $HEAD_SHA | awk -F'/' '{print $1}' | sort -u | tr '\n' ',')
+        CHANGED_DIRS=${CHANGED_DIRS%,}
+        echo "CHANGED_DIRS=$CHANGED_DIRS" >> $GITHUB_ENV
+        echo "Changed dirs: $CHANGED_DIRS"
 
-    - name: Initialization ${{ matrix.platform }} compile environment
+    - name: Init ${{ matrix.platform }} compile environment
       run: |
         sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /usr/local/lib/android
-        echo "install packages!!!!!!"
         sudo -E apt-get -qq update
         sudo -E apt-get -qq install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
             bzip2 ccache clang cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib \
@@ -89,18 +86,17 @@ jobs:
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
 
-    - name: ${{ matrix.platform }} sdk download
+    - name: Download SDK
       run: |
         wget ${{ matrix.url_sdk }}
         file_name=$(echo ${{matrix.url_sdk}} | awk -F/ '{print $NF}')
         mkdir sdk && tar --zstd -x -f $file_name -C ./sdk --strip-components=1
-        cd sdk
 
     - name: SSH connection to Actions
       uses: mxschmitt/action-tmate@v3.13
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh != 'false') || contains(github.event.action, 'ssh')
 
-    - name: ${{ matrix.platform }} feeds configuration packages
+    - name: Configure feeds and apply patches
       run: |
         cd sdk
         cat > feeds.conf.default << EOF
@@ -115,63 +111,108 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
-        #--------------------------------------begin_patches------------------------------------------
-        echo "Start applying the patch"
-
-
+        # Patches: refresh golang/rust from a known commit and fix Rust host build
         rm -rf temp_resp
         git clone -b master --single-branch https://github.com/openwrt/packages.git temp_resp
         cd temp_resp
         git checkout 2b99cd7d7637da0f152da378994f699aaf0dd44d
         cd ..
-        echo "update golang version"
-        rm -rf feeds/packages/lang/golang
-        cp -r temp_resp/lang/golang feeds/packages/lang
-        echo "update rust version"
-        rm -rf feeds/packages/lang/rust
-        cp -r temp_resp/lang/rust feeds/packages/lang
+        rm -rf feeds/packages/lang/golang && cp -r temp_resp/lang/golang feeds/packages/lang
+        rm -rf feeds/packages/lang/rust && cp -r temp_resp/lang/rust feeds/packages/lang
         rm -rf temp_resp
 
-        echo "fixed rust host build error"
         sed -i 's/--set=llvm\.download-ci-llvm=false/--set=llvm.download-ci-llvm=true/' feeds/packages/lang/rust/Makefile
         grep -q -- '--ci false \\' feeds/packages/lang/rust/Makefile || sed -i '/x\.py \\/a \        --ci false \\' feeds/packages/lang/rust/Makefile
 
-
-        echo "Patch application completed"
-        #--------------------------------------end_patches--------------------------------------------
-
+    - name: Generate minimal .config
+      run: |
+        cd sdk
         echo "CONFIG_ALL_NONSHARED=n" > .config
         echo "CONFIG_ALL_KMODS=n" >> .config
         echo "CONFIG_ALL=n" >> .config
         echo "CONFIG_AUTOREMOVE=n" >> .config
         echo "CONFIG_SIGNED_PACKAGES=n" >> .config
-        make defconfig
 
-
-    - name: ${{ matrix.platform }} download
-      run: |
-        cd sdk
-        make download -j8
-        find dl -size -1024c -exec ls -l {} \;
-
-    - name: Compile Changed Packages
-      id: compile
+    - name: Select packages into .config (changed mode)
+      if: env.MODE == 'changed'
       run: |
         cd sdk
         if [ -z "$CHANGED_DIRS" ]; then
-          echo "No changes detected in passwall_packages"
-          exit 0
+          echo "No changes detected; skipping selection."
+        else
+          IFS=',' read -ra DIRS <<< "$CHANGED_DIRS"
+          for DIR in "${DIRS[@]}"; do
+            MF="package/feeds/passwall_packages/$DIR/Makefile"
+            if [ -f "$MF" ]; then
+              PKG_NAME=$(awk -F ':=' '/^PKG_NAME:=/{print $2}' "$MF" | head -n1)
+              [ -z "$PKG_NAME" ] && PKG_NAME="$DIR"
+              echo "CONFIG_PACKAGE_${PKG_NAME}=m" >> .config
+              echo "Selected package: $PKG_NAME"
+            else
+              echo "Warning: $DIR has no Makefile under passwall_packages"
+            fi
+          done
         fi
-        IFS=',' read -ra DIRS <<< "$CHANGED_DIRS"
-        for DIR in "${DIRS[@]}"; do
-          if [ -d "package/feeds/passwall_packages/$DIR" ]; then
-            echo "Compiling changes in directory: $DIR"
-            make package/feeds/passwall_packages/$DIR/compile -j$(nproc) V=s || exit 1
-          else
-            echo "Directory $DIR does not exist"
-            exit 1
-          fi
+        make defconfig
+
+    - name: Select packages into .config (all mode with exclusions)
+      if: env.MODE == 'all'
+      run: |
+        cd sdk
+        EXCLUDES="dns2socks ip2socks microsocks shadow-tls shadowsocks-libev trojan-plus xray-plugin"
+        mapfile -t PKG_DIRS < <(find package/feeds/passwall_packages -maxdepth 2 -type f -name Makefile -print | sed 's#/Makefile##')
+        for D in "${PKG_DIRS[@]}"; do
+          MF="$D/Makefile"
+          [ -f "$MF" ] || continue
+          PKG_NAME=$(awk -F ':=' '/^PKG_NAME:=/{print $2}' "$MF" | head -n1)
+          [ -z "$PKG_NAME" ] && PKG_NAME=$(basename "$D")
+          SKIP=0
+          for E in $EXCLUDES; do
+            if [ "$PKG_NAME" = "$E" ]; then SKIP=1; break; fi
+          done
+          [ $SKIP -eq 1 ] && { echo "Excluded: $PKG_NAME"; continue; }
+          echo "CONFIG_PACKAGE_${PKG_NAME}=m" >> .config
+          echo "Selected (all-mode): $PKG_NAME"
         done
+        make defconfig
 
-        
+    - name: Build packages
+      run: |
+        cd sdk
+        if [ "${MODE}" = "changed" ] && [ -n "$CHANGED_DIRS" ]; then
+          IFS=',' read -ra DIRS <<< "$CHANGED_DIRS"
+          for DIR in "${DIRS[@]}"; do
+            echo "Compiling DIR: $DIR"
+            make package/$DIR/compile -j$(nproc) V=s || \
+          done
+        else
+          mapfile -t SELECTED < <(grep -E '^CONFIG_PACKAGE_' .config | sed 's/^CONFIG_PACKAGE_//;s/=m$//;s/=y$//')
+          for PKG in "${SELECTED[@]}"; do
+            echo "Compiling PKG: $PKG"
+            make package/$PKG/compile -j$(nproc) V=s || true
+          done
+        fi
 
+    - name: Collect and compress ipks
+      run: |
+        mkdir -p "$GITHUB_WORKSPACE/output"
+        cd sdk/bin/packages
+        tar -czf "$GITHUB_WORKSPACE/output/ipks-${{ matrix.platform }}.tar.gz" */passwall_packages/*.ipk
+        ls -l "$GITHUB_WORKSPACE/output/ipks-${{ matrix.platform }}.tar.gz" || true
+
+    - name: Get latest release tag
+      id: get_release
+      run: |
+        TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+        echo "LATEST_TAG=$TAG" >> $GITHUB_ENV
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload compressed ipks to Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.LATEST_TAG }}
+        files: output/ipks-${{ matrix.platform }}.tar.gz
+        append: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
