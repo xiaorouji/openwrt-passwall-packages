@@ -365,7 +365,9 @@ jobs:
             git commit -m "chore: auto change"
             git push origin $branch
 
-
+            git config --global user.email "smallprogram@foxmail.com"
+            git config --global user.name "smallprogram"
+            
             gh pr create \
             --title "$title" \
             --body "$title" \
