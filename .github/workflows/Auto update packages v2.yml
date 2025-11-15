@@ -375,5 +375,4 @@ jobs:
             --base main \
             --head "$branch" \
             --label "automated-pr" \
-            --draft false
           fi
