@@ -366,7 +366,7 @@ jobs:
             echo "No duplicate found, will create PR."
             git checkout -b "$branch"
             git add .
-            git commit -m "chore: auto change"
+            git commit -m "${{ matrix.pakcages }}: update to ${{ steps.update.outputs.version }}"
             git push origin $branch
 
             gh pr create \
