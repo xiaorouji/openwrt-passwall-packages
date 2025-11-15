@@ -374,5 +374,5 @@ jobs:
             --body "$title" \
             --base main \
             --head "$branch" \
-            --label "automated-pr" \
+            --label "automated-pr"
           fi
