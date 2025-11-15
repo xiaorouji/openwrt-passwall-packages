@@ -344,20 +344,35 @@ jobs:
       - name: Create Pull Request
         id: cpr
         if: steps.check.outputs.status == 'success' && steps.check.outputs.New_PKG_VERSION != '' && steps.update.outputs.branch_exists == '' && !cancelled()
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "${{ matrix.pakcages }}: update to ${{ steps.update.outputs.version }}"
-          committer: smallprogram <smallprogram@foxmail.com>
-          author: smallprogram <smallprogram@foxmail.com>
-          signoff: false
-          branch: patches-${{ matrix.pakcages }}-${{ steps.update.outputs.version }}
-          base: main
-          delete-branch: true
-          body: |
-            ${{ matrix.pakcages }}: update to ${{ steps.update.outputs.version }}
-          title: "${{ matrix.pakcages }}: update to ${{ steps.update.outputs.version }}"
-          labels: |
-            automated-pr
-          draft: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          branch="patches-${{ matrix.pakcages }}-${{ steps.update.outputs.version }}"
+          title="${{ matrix.pakcages }}: update to ${{ steps.update.outputs.version }}"
+          EXISTING=$(gh pr list \
+            --state open \
+            --base main \
+            --json number,title \
+            --jq ".[] | select(.title == \"$title\") | .number" \
+            || echo "")
 
+          if [ -n "$EXISTING" ]; then
+            echo "Duplicate PR with title '$TITLE' already exists: #$EXISTING"
+          else
+            git config --global user.email "smallprogram@foxmail.com"
+            git config --global user.name "smallprogram"
+
+            
+            echo "No duplicate found, will create PR."
+            git checkout -b "$branch"
+            git add .
+            git commit -m "${{ matrix.pakcages }}: update to ${{ steps.update.outputs.version }}"
+            git push origin $branch
+
+            gh pr create \
+            --title "$title" \
+            --body "$title" \
+            --base main \
+            --head "$branch" \
+            --label "automated-pr"
+          fi
