@@ -342,6 +342,7 @@ jobs:
           echo "branch_exists=$(git ls-remote --heads origin patches-${{ matrix.pakcages }}-$New_PKG_VERSION | tr -d '\n')" >> $GITHUB_OUTPUT
 
       - name: Clean duplicate Authorization header
+        if: steps.check.outputs.status == 'success' && steps.check.outputs.New_PKG_VERSION != '' && !cancelled()
         run: |
           git config --local --unset-all http.https://github.com/.extraheader || true
           git config --local --unset-all http.https://github.com/extraheader || true
