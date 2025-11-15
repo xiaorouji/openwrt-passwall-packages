@@ -30,7 +30,7 @@ env:
 
 jobs:
   job_init:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@main
@@ -57,7 +57,7 @@ jobs:
   job_auto_update_packages:
     if: ${{ always() }}
     needs: job_init
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     name: Auto-update-${{ matrix.pakcages }} 
     strategy:
       fail-fast: false
