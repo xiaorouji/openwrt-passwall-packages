@@ -57,7 +57,7 @@ jobs:
   job_auto_update_packages:
     if: ${{ always() }}
     needs: job_init
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     name: Auto-update-${{ matrix.pakcages }} 
     strategy:
       fail-fast: false
