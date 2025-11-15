@@ -359,15 +359,16 @@ jobs:
           if [ -n "$EXISTING" ]; then
             echo "Duplicate PR with title '$TITLE' already exists: #$EXISTING"
           else
+            git config --global user.email "smallprogram@foxmail.com"
+            git config --global user.name "smallprogram"
+
+            
             echo "No duplicate found, will create PR."
             git checkout -b "$branch"
             git add .
             git commit -m "chore: auto change"
             git push origin $branch
 
-            git config --global user.email "smallprogram@foxmail.com"
-            git config --global user.name "smallprogram"
-            
             gh pr create \
             --title "$title" \
             --body "$title" \
