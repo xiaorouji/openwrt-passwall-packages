@@ -12,13 +12,13 @@ PKG_MAINTAINER:=Tianling Shen <cnsztl@immortalwrt.org>
 
 include $(INCLUDE_DIR)/package.mk
 
-GEOIP_VER:=202511270021
+GEOIP_VER:=202512040022
 GEOIP_FILE:=geoip.dat.$(GEOIP_VER)
 define Download/geoip
   URL:=https://github.com/Loyalsoldier/geoip/releases/download/$(GEOIP_VER)/
   URL_FILE:=geoip.dat
   FILE:=$(GEOIP_FILE)
-  HASH:=5b6fe77546c989308620dda7cc584995b92003f1fc1b53b4d18c039d9a97790a
+  HASH:=bfa24c05bca81164fe859f26ff6db8bd7195d2faf775c2ff374c4b4fadbea479
 endef
 
 GEOSITE_VER:=202511262214
