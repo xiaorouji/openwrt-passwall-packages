@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Initialization environment
         run: |
@@ -26,15 +26,12 @@ jobs:
       - name: Install GitHub CLI
         run: sudo apt-get update && sudo apt-get install -y gh
 
-      - name: Delete old release and tag
-        run: |
-          gh release delete api-cache --cleanup-tag -y || echo "No existing release to delete"
+      - name: Fetch GitHub release JSONs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Fetch GitHub release JSONs
         run: |
-          mkdir -p output
+          mkdir -p output old_json
+
           declare -A repos
           repos["geoview"]="snowie2000/geoview"
           repos["chinadns-ng"]="zfl9/chinadns-ng"
@@ -42,14 +39,62 @@ jobs:
           repos["sing-box"]="SagerNet/sing-box"
           repos["hysteria"]="HyNetwork/hysteria"
 
+          echo "Downloading previous api-cache release assets (if exists)..."
+          gh release download api-cache --dir old_json --pattern "*.json" || echo "No previous release found"
+
           for name in "${!repos[@]}"; do
             repo="${repos[$name]}"
-            echo "Fetching release JSONs for $name from $repo ..."
+            echo "Processing $name from $repo ..."
+
+            for t in release pre-release; do
+              old="old_json/${name}-${t}-api.json"
+              if [ -f "$old" ]; then
+                cp "$old" "output/${name}-${t}-api.json.bak"
+              fi
+            done
+
             curl -sL "https://api.github.com/repos/$repo/releases/latest" -o "output/${name}-release-api.json"
             curl -sL "https://api.github.com/repos/$repo/releases?per_page=1" -o "output/${name}-pre-release-api.json"
+
+            for t in release pre-release; do
+              file="output/${name}-${t}-api.json"
+
+              TAG_NAME=$(grep -oP '"tag_name": "\K[^"]+' "$file" || true)
+
+              if [ -z "$TAG_NAME" ]; then
+                echo "❌ ${file} No tag_name, restore old files..."
+                rm -f "$file"
+
+                if [ -f "${file}.bak" ]; then
+                  mv "${file}.bak" "$file"
+                fi
+              else
+                echo "✅ ${file} Verification successful, delete bak."
+                rm -f "${file}.bak"
+              fi
+            done
           done
 
+      - name: Check output directory
+        id: check_output
+        run: |
+          if [ -z "$(ls -A output 2>/dev/null)" ]; then
+            echo "empty=true" >> $GITHUB_OUTPUT
+            echo "⚠️ The output directory is empty, and subsequent Upload/Release steps will be skipped."
+          else
+            echo "empty=false" >> $GITHUB_OUTPUT
+            echo "✔ The output directory contains files."
+          fi
+
+      - name: Delete old release and tag
+        if: steps.check_output.outputs.empty == 'false'
+        run: |
+          gh release delete api-cache --cleanup-tag -y || echo "No existing release to delete."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload to release
+        if: steps.check_output.outputs.empty == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: api-cache
