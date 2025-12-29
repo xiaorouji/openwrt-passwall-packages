@@ -225,12 +225,19 @@
  }
  
  static int is_authed(union sockaddr_union *client, union sockaddr_union *authedip) {
-@@ -345,12 +505,15 @@
+@@ -322,6 +482,7 @@
+ 	ssize_t n;
+ 	int ret;
+ 	enum authmethod am;
++	int used_rule = 0;
+ 	t->state = SS_1_CONNECTED;
+ 	while((n = recv(t->client.fd, buf, sizeof buf, 0)) > 0) {
+ 		switch(t->state) {
+@@ -345,12 +506,14 @@
  				}
  				break;
  			case SS_3_AUTHED:
 -				ret = connect_socks_target(buf, n, &t->client);
-+				int used_rule = 0;
 +				ret = connect_socks_target(buf, n, &t->client, &used_rule);
  				if(ret < 0) {
  					send_error(t->client.fd, ret*-1);
