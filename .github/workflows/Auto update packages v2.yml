@@ -27,6 +27,9 @@ on:
 env:
   TZ: Asia/Shanghai
 
+permissions:
+  contents: write
+  actions: write
 
 jobs:
   job_init:
