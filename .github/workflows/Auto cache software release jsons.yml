@@ -12,6 +12,9 @@ on:
 env:
   TZ: Asia/Shanghai
 
+permissions:
+  contents: write
+
 jobs:
   cache_json:
     runs-on: ubuntu-latest
