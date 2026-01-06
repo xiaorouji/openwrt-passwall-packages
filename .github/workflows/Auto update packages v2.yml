@@ -30,6 +30,7 @@ env:
 permissions:
   contents: write
   actions: write
+  pull-requests: write
 
 jobs:
   job_init:
