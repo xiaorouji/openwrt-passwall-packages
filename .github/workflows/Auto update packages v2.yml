@@ -363,8 +363,8 @@ jobs:
           if [ -n "$EXISTING" ]; then
             echo "Duplicate PR with title '$TITLE' already exists: #$EXISTING"
           else
-            git config --global user.email "smallprogram@foxmail.com"
-            git config --global user.name "smallprogram"
+            git config --global user.email "smallprogramzhusir@gmail.com"
+            git config --global user.name "David Mandy"
 
             
             echo "No duplicate found, will create PR."
