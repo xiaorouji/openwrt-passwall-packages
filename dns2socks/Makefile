@@ -9,7 +9,7 @@ PKG_VERSION:=2.1
 PKG_RELEASE:=2
 
 PKG_SOURCE:=SourceCode.zip
-PKG_SOURCE_URL:=https://github.com/xiaorouji/openwrt-passwall-packages/releases/download/dns2socks
+PKG_SOURCE_URL:=https://github.com/Openwrt-Passwall/openwrt-passwall-packages/releases/download/dns2socks
 PKG_SOURCE_DATE:=2020-02-18
 PKG_HASH:=406b5003523577d39da66767adfe54f7af9b701374363729386f32f6a3a995f4
 
