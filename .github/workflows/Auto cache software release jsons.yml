@@ -104,6 +104,8 @@ jobs:
           tag_name: api-cache
           name: Software Release API Cache
           files: output/*.json
+          draft: false
+          prerelease: true
           body: |
             This release contains cached GitHub Release API JSON data for several software projects.  
             It is used by the PassWall (and PassWall2) update component to reduce reliance on GitHub's rate-limited API (60 requests per IP per hour).  
