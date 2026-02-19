@@ -18,6 +18,8 @@ permissions:
 
 jobs:
   cache_json:
+    outputs:
+     must_upload: ${{ steps.fetch.outputs.must_upload }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -31,10 +33,13 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y gh
 
       - name: Fetch GitHub release JSONs
+        id: fetch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p output old_json
+
+          MUST_UPLOAD=false
 
           declare -A repos
           repos["geoview"]="snowie2000/geoview"
@@ -54,6 +59,9 @@ jobs:
               old="old_json/${name}-${t}-api.json"
               if [ -f "$old" ]; then
                 cp "$old" "output/${name}-${t}-api.json.bak"
+              else
+                echo "⚠️ Missing old file: $old"
+                MUST_UPLOAD=true
               fi
             done
 
@@ -73,32 +81,48 @@ jobs:
                   mv "${file}.bak" "$file"
                 fi
               else
-                echo "✅ ${file} Verification successful, delete bak."
+                if [ -f "${file}.bak" ]; then
+                  OLD_TAG=$(grep -oP '"tag_name": "\K[^"]+' "${file}.bak" || true)
+                  if [ "$OLD_TAG" != "$TAG_NAME" ]; then
+                    echo "🔄 Version changed: $OLD_TAG → $TAG_NAME"
+                    MUST_UPLOAD=true
+                  else
+                    echo "✔ Version unchanged: $TAG_NAME"
+                  fi
+                fi
                 rm -f "${file}.bak"
               fi
             done
           done
 
-      - name: Check output directory
-        id: check_output
-        run: |
           if [ -z "$(ls -A output 2>/dev/null)" ]; then
-            echo "empty=true" >> $GITHUB_OUTPUT
-            echo "⚠️ The output directory is empty, and subsequent Upload/Release steps will be skipped."
+            echo "⚠️ output directory is empty, force MUST_UPLOAD=false"
+            MUST_UPLOAD=false
+          fi
+
+          echo "MUST_UPLOAD=$MUST_UPLOAD"
+          echo "must_upload=$MUST_UPLOAD" >> $GITHUB_OUTPUT
+
+      - name: Check if upload is required
+        id: check_upload
+        run: |
+          if [ "${{ steps.fetch.outputs.must_upload }}" = "true" ]; then
+            echo "upload=true" >> $GITHUB_OUTPUT
+            echo "🚀 Upload required."
           else
-            echo "empty=false" >> $GITHUB_OUTPUT
-            echo "✔ The output directory contains files."
+            echo "upload=false" >> $GITHUB_OUTPUT
+            echo "✔ No changes detected, skip release."
           fi
 
       - name: Delete old release and tag
-        if: steps.check_output.outputs.empty == 'false'
+        if: steps.check_upload.outputs.upload == 'true'
         run: |
           gh release delete api-cache --cleanup-tag -y || echo "No existing release to delete."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload to release
-        if: steps.check_output.outputs.empty == 'false'
+        if: steps.check_upload.outputs.upload == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: api-cache
